@@ -1,0 +1,191 @@
+/* ==========================================================================
+   StudyTrack · responsive.css
+   Ajustes progresivos para pantallas más grandes (mobile-first: solo se usan
+   media queries min-width). Se carga después de style.css.
+
+   Puntos de corte
+   - 600px  → móviles grandes y tablets pequeñas
+   - 768px  → tablets
+   - 1024px → escritorio: sidebar fija, sin navegación inferior ni FAB
+   - 1280px → escritorio ancho
+   ========================================================================== */
+
+
+/* ≥ 600px ------------------------------------------------------------------ */
+@media (min-width: 600px) {
+  .content {
+    padding: 1.5rem 1.5rem 2rem;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .form-actions {
+    flex-direction: row;
+    justify-content: flex-end;
+  }
+
+  .toasts {
+    left: auto;
+    width: 380px;
+  }
+
+  .card {
+    padding: 1.35rem;
+  }
+
+  .hero {
+    padding: 1.75rem 1.75rem;
+  }
+
+  .hero__title {
+    font-size: 1.75rem;
+  }
+}
+
+
+/* ≥ 768px ------------------------------------------------------------------ */
+@media (min-width: 768px) {
+  .auth__hero {
+    padding: 2.5rem 3rem 5rem;
+  }
+
+  .auth__title {
+    font-size: 2rem;
+  }
+
+  .auth__panel {
+    padding-top: 2.75rem;
+  }
+
+  .page-header__title {
+    font-size: var(--fs-2xl);
+  }
+}
+
+
+/* ≥ 1024px: escritorio ----------------------------------------------------- */
+@media (min-width: 1024px) {
+  /* La app pasa a dos columnas: sidebar fija + contenido */
+  .app {
+    display: grid;
+    grid-template-columns: var(--sidebar-w) minmax(0, 1fr);
+  }
+
+  .sidebar {
+    position: sticky;
+    top: 0;
+    z-index: auto;
+    width: var(--sidebar-w);
+    height: 100vh;
+    height: 100dvh;
+    box-shadow: none;
+    transform: none;
+    visibility: visible;
+    transition: none;
+  }
+
+  .sidebar__close,
+  .sidebar-backdrop,
+  .topbar__menu,
+  .bottom-nav,
+  .fab {
+    display: none !important;
+  }
+
+  .hide-mobile {
+    display: revert !important;
+  }
+
+  .hide-desktop {
+    display: none !important;
+  }
+
+  .app__main {
+    padding-bottom: 0;
+  }
+
+  .topbar {
+    height: 72px;
+    padding: 0 2rem;
+  }
+
+  .topbar__title {
+    font-size: 1.35rem;
+  }
+
+  .content {
+    padding: 1.75rem 2rem 3rem;
+  }
+
+  .toasts {
+    top: 84px;
+    right: 2rem;
+  }
+
+  /* Login / registro: pantalla dividida en dos mitades */
+  .auth {
+    flex-direction: row;
+  }
+
+  .auth__hero {
+    flex: 1 1 50%;
+    display: flex;
+    flex-direction: column;
+    padding: 3rem 4rem;
+  }
+
+  .auth__hero-body {
+    margin: auto 0;
+  }
+
+  .auth__title {
+    max-width: 14ch;
+    font-size: 2.75rem;
+  }
+
+  .auth__subtitle {
+    font-size: 1.05rem;
+  }
+
+  .auth__features {
+    display: grid;
+    gap: .9rem;
+    margin-top: 2.25rem;
+  }
+
+  .auth__features li {
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+    font-weight: 500;
+  }
+
+  .auth__features i {
+    display: grid;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: rgb(255 255 255 / .16);
+    font-size: 1.15rem;
+  }
+
+  .auth__panel {
+    flex: 1 1 50%;
+    display: flex;
+    align-items: center;
+    margin-top: 0;
+    padding: 3rem;
+    border-radius: 0;
+  }
+}
+
+
+/* ≥ 1280px ----------------------------------------------------------------- */
+@media (min-width: 1280px) {
+  .content {
+    padding: 2rem 2.5rem 3rem;
+  }
+}
