@@ -16,7 +16,9 @@
    9.  Insignias, avatar y barras de progreso
    10. Estados vacíos y páginas de error
    11. Autenticación (login / registro)
-   12. Animaciones
+   12. Componentes de datos (chips, listas, estadísticas, gráficos)
+   13. Dashboard
+   14. Animaciones
    ========================================================================== */
 
 
@@ -650,6 +652,20 @@ button, input, select, textarea {
   --btn-border: transparent;
 }
 
+/* Botón translúcido para usar sobre fondos con degradado */
+.btn--glass {
+  --btn-bg: rgb(255 255 255 / .16);
+  --btn-fg: #fff;
+  --btn-border: rgb(255 255 255 / .24);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+}
+
+.btn--glass:hover {
+  --btn-bg: rgb(255 255 255 / .26);
+  border-color: rgb(255 255 255 / .35);
+}
+
 .btn--block { width: 100%; }
 
 .btn--lg {
@@ -1174,6 +1190,11 @@ button, input, select, textarea {
   animation: progress-grow 1s var(--ease-out) both;
 }
 
+.progress--sm { height: 8px; }
+.progress__bar--success { background: var(--c-success); }
+.progress__bar--warning { background: var(--c-warning); }
+.progress__bar--danger  { background: var(--c-danger); }
+
 
 /* 10. Estados vacíos y páginas de error
    ========================================================================== */
@@ -1205,6 +1226,28 @@ button, input, select, textarea {
   max-width: 36ch;
   margin: 0 auto 1.25rem;
   font-size: .9rem;
+}
+
+.empty--compact {
+  padding: 1.25rem .5rem .75rem;
+}
+
+.empty--compact .empty__icon {
+  width: 52px;
+  height: 52px;
+  margin-bottom: .75rem;
+  border-radius: 16px;
+  font-size: 1.5rem;
+}
+
+.empty--compact .empty__title {
+  font-size: .95rem;
+  font-weight: 700;
+}
+
+.empty--compact .empty__text {
+  margin-bottom: 1rem;
+  font-size: .85rem;
 }
 
 .error-page {
@@ -1368,7 +1411,562 @@ button, input, select, textarea {
 }
 
 
-/* 12. Animaciones
+/* 12. Componentes de datos
+   ========================================================================== */
+
+/* --- Color de asignatura: los elementos reciben style="--subject: #RRGGBB" --- */
+.dot {
+  display: inline-block;
+  flex-shrink: 0;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--subject, currentColor);
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: .4rem;
+  max-width: 100%;
+  padding: .25rem .7rem;
+  border-radius: var(--radius-full);
+  background: var(--c-surface-3);
+  background: color-mix(in srgb, var(--subject, var(--c-primary)) 14%, transparent);
+  color: var(--c-text);
+  color: color-mix(in srgb, var(--subject, var(--c-primary)) 65%, var(--c-text));
+  font-size: .78rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* --- Lista de detalles con icono (fecha, hora, aula…) --- */
+.meta-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .35rem 1rem;
+  color: var(--c-text-2);
+  font-size: .875rem;
+}
+
+.meta-list li {
+  display: inline-flex;
+  align-items: center;
+  gap: .35rem;
+}
+
+.meta-list i {
+  color: var(--c-text-3);
+  font-size: 1rem;
+}
+
+/* --- Listas compactas dentro de tarjetas --- */
+.mini-list > li + li {
+  border-top: 1px solid var(--c-border);
+}
+
+.task-mini {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  margin: 0 -.5rem;
+  padding: .75rem .5rem;
+  border-radius: var(--radius);
+  color: inherit;
+  transition: background var(--dur) var(--ease);
+}
+
+.task-mini:hover {
+  background: var(--c-surface-2);
+  text-decoration: none;
+}
+
+.task-mini__bar {
+  flex-shrink: 0;
+  align-self: stretch;
+  width: 4px;
+  border-radius: 4px;
+  background: var(--subject, var(--c-border-strong));
+}
+
+.task-mini__body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: .15rem;
+  min-width: 0;
+}
+
+.task-mini__title {
+  overflow: hidden;
+  color: var(--c-text);
+  font-size: .95rem;
+  font-weight: 600;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.task-mini__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: .15rem .75rem;
+  color: var(--c-text-2);
+  font-size: .8rem;
+}
+
+.task-mini__meta > span {
+  display: inline-flex;
+  align-items: center;
+  gap: .25rem;
+}
+
+.task-mini__late {
+  color: var(--c-danger);
+  font-weight: 600;
+}
+
+.task-mini__status {
+  color: var(--c-info);
+  font-weight: 600;
+}
+
+.task-mini.is-overdue .task-mini__bar {
+  background: var(--c-danger);
+}
+
+.grade-mini {
+  display: flex;
+  align-items: center;
+  gap: .85rem;
+  padding: .7rem 0;
+}
+
+.grade-mini__body {
+  display: flex;
+  flex-direction: column;
+  gap: .1rem;
+  min-width: 0;
+}
+
+.grade-mini__subject {
+  display: flex;
+  align-items: center;
+  gap: .45rem;
+  overflow: hidden;
+  font-size: .92rem;
+  font-weight: 600;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.grade-mini__meta {
+  color: var(--c-text-2);
+  font-size: .8rem;
+}
+
+.grade-pill {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  min-width: 52px;
+  height: 42px;
+  padding: 0 .5rem;
+  border-radius: var(--radius);
+  font-size: 1rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.grade-pill--pass { background: var(--c-success-soft); color: var(--c-success-text); }
+.grade-pill--fail { background: var(--c-danger-soft);  color: var(--c-danger-text); }
+
+/* --- Tarjetas de estadística (número grande + etiqueta) --- */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: .75rem;
+}
+
+.stat {
+  --stat-color: var(--c-primary);
+  --stat-soft: var(--c-primary-soft);
+  display: flex;
+  flex-direction: column;
+  gap: .55rem;
+  padding: 1rem;
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius-lg);
+  background: var(--c-surface);
+  box-shadow: var(--shadow-xs);
+  color: inherit;
+  transition: transform var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
+}
+
+a.stat:hover {
+  text-decoration: none;
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.stat__icon {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius);
+  background: var(--stat-soft);
+  color: var(--stat-color);
+  font-size: 1.25rem;
+}
+
+.stat__value {
+  font-size: 1.65rem;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -.02em;
+  font-variant-numeric: tabular-nums;
+}
+
+.stat__label {
+  color: var(--c-text-2);
+  font-size: .8rem;
+  font-weight: 500;
+}
+
+.stat--success { --stat-color: var(--c-success); --stat-soft: var(--c-success-soft); }
+.stat--warning { --stat-color: var(--c-warning); --stat-soft: var(--c-warning-soft); }
+.stat--danger  { --stat-color: var(--c-danger);  --stat-soft: var(--c-danger-soft); }
+.stat--info    { --stat-color: var(--c-info);    --stat-soft: var(--c-info-soft); }
+
+/* --- Cuenta atrás --- */
+.countdown {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: .5rem;
+  margin-top: 1rem;
+}
+
+.countdown__unit {
+  padding: .65rem .25rem .55rem;
+  border-radius: var(--radius);
+  background: var(--c-primary-soft);
+  text-align: center;
+}
+
+.countdown__value {
+  display: block;
+  color: var(--c-primary);
+  font-size: 1.45rem;
+  font-weight: 800;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+}
+
+.countdown__label {
+  color: var(--c-text-2);
+  font-size: .68rem;
+  font-weight: 600;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+}
+
+.countdown__done {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  margin-top: 1rem;
+  padding: .8rem 1rem;
+  border-radius: var(--radius);
+  background: var(--c-success-soft);
+  color: var(--c-success-text);
+  font-weight: 600;
+}
+
+/* --- Filas con barra de progreso --- */
+.progress-row + .progress-row {
+  margin-top: .85rem;
+}
+
+.progress-row__head {
+  display: flex;
+  justify-content: space-between;
+  gap: .5rem;
+  margin-bottom: .4rem;
+  font-size: .85rem;
+  font-weight: 600;
+}
+
+/* --- Anillo de progreso (SVG) --- */
+.ring {
+  position: relative;
+  flex-shrink: 0;
+  width: 116px;
+  height: 116px;
+}
+
+.ring svg {
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+
+.ring__track,
+.ring__value {
+  fill: none;
+  stroke-width: 10;
+}
+
+.ring__track {
+  stroke: var(--c-surface-3);
+}
+
+.ring__value {
+  stroke: url(#ring-gradient);
+  stroke-linecap: round;
+  stroke-dasharray: var(--circ);
+  stroke-dashoffset: var(--offset);
+  animation: ring-fill 1.2s var(--ease-out) both;
+}
+
+.ring--fail .ring__value {
+  stroke: var(--c-danger);
+}
+
+.ring__label {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  line-height: 1.1;
+}
+
+.ring__number {
+  font-size: 1.6rem;
+  font-weight: 800;
+  letter-spacing: -.02em;
+}
+
+.ring__caption {
+  color: var(--c-text-2);
+  font-size: .72rem;
+  font-weight: 600;
+}
+
+/* --- Gráfico de barras semanal ---
+   La altura de cada barra llega desde PHP en píxeles (--h, máximo 80px). */
+.week-chart {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: .4rem;
+  margin-top: 1.25rem;
+}
+
+.week-chart__day {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: .4rem;
+}
+
+.week-chart__track {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
+  width: 100%;
+  height: 100px;
+}
+
+.week-chart__count {
+  color: var(--c-text-2);
+  font-size: .7rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.week-chart__bar {
+  flex-shrink: 0;
+  width: 100%;
+  max-width: 28px;
+  height: var(--h, 0px);
+  min-height: 6px;
+  border-radius: 8px 8px 4px 4px;
+  background: var(--c-surface-3);
+  transform-origin: bottom;
+  animation: bar-grow .8s var(--ease-out) both;
+  animation-delay: calc(var(--i, 0) * 60ms);
+}
+
+.week-chart__bar.has-value {
+  background: linear-gradient(180deg, #7c3aed 0%, #4f46e5 100%);
+}
+
+.week-chart__label {
+  color: var(--c-text-3);
+  font-size: .72rem;
+  font-weight: 700;
+}
+
+.week-chart__day.is-today .week-chart__label {
+  color: var(--c-primary);
+}
+
+.week-chart__day.is-today .week-chart__bar:not(.has-value) {
+  background: var(--c-primary-soft);
+}
+
+
+/* 13. Dashboard
+   ==========================================================================
+   Móvil: una sola columna. Los contenedores .dashboard__main y __side usan
+   display: contents para que sus tarjetas se ordenen libremente con "order".
+   En responsive.css se convierten en dos columnas reales.
+   ========================================================================== */
+.dashboard {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1rem;
+}
+
+.dashboard__main,
+.dashboard__side {
+  display: contents;
+}
+
+.dash-hero     { order: 1; }
+.dash-stats    { order: 2; }
+.dash-exam     { order: 3; }
+.dash-today    { order: 4; }
+.dash-week     { order: 5; }
+.dash-progress { order: 6; }
+.dash-grades   { order: 7; }
+.dash-subjects { order: 8; }
+
+.hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .5rem;
+  margin-top: 1.1rem;
+}
+
+.exam-next__name {
+  margin: .65rem 0 .5rem;
+  font-size: 1.1rem;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.week-progress__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: .5rem;
+  margin-bottom: .5rem;
+}
+
+.week-progress__value {
+  font-size: 1.6rem;
+  font-weight: 800;
+  letter-spacing: -.02em;
+}
+
+.week-summary {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: .5rem;
+  margin-top: 1.1rem;
+  padding-top: .9rem;
+  border-top: 1px solid var(--c-border);
+  color: var(--c-text-2);
+  font-size: .82rem;
+}
+
+.week-summary li {
+  display: inline-flex;
+  align-items: center;
+  gap: .3rem;
+}
+
+.week-summary i {
+  color: var(--c-primary);
+}
+
+.week-summary strong {
+  color: var(--c-text);
+}
+
+.academic {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.academic__rows {
+  flex: 1;
+  min-width: 0;
+}
+
+.subject-grid {
+  display: grid;
+  gap: .75rem;
+}
+
+.subject-tile {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: .45rem;
+  overflow: hidden;
+  padding: .9rem 1rem .9rem 1.2rem;
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius);
+  background: var(--c-surface-2);
+  color: inherit;
+  transition: border-color var(--dur) var(--ease), transform var(--dur) var(--ease);
+}
+
+.subject-tile::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 5px;
+  background: var(--subject);
+}
+
+.subject-tile:hover {
+  border-color: var(--c-border-strong);
+  text-decoration: none;
+  transform: translateY(-1px);
+}
+
+.subject-tile__name {
+  font-weight: 700;
+}
+
+.subject-tile__teacher {
+  display: flex;
+  align-items: center;
+  gap: .3rem;
+  color: var(--c-text-2);
+  font-size: .8rem;
+}
+
+.subject-tile__stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .4rem;
+  margin-top: .15rem;
+}
+
+
+/* 14. Animaciones
    ========================================================================== */
 @keyframes page-in {
   from { opacity: 0; transform: translateY(8px); }
@@ -1401,6 +1999,14 @@ button, input, select, textarea {
 
 @keyframes progress-grow {
   from { width: 0; }
+}
+
+@keyframes bar-grow {
+  from { transform: scaleY(0); }
+}
+
+@keyframes ring-fill {
+  from { stroke-dashoffset: var(--circ); }
 }
 
 @keyframes spin {

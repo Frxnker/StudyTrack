@@ -363,6 +363,23 @@ function initials(string $fullName): string
 }
 
 /**
+ * Cantidad con su palabra en singular o plural: plural(1, 'tarea', 'tareas') → "1 tarea".
+ */
+function plural(int $count, string $singular, string $plural): string
+{
+    return $count . ' ' . ($count === 1 ? $singular : $plural);
+}
+
+/**
+ * Color hexadecimal seguro para usar en atributos style="".
+ * Si el valor no es #RRGGBB se usa el color por defecto (evita inyectar CSS).
+ */
+function safe_color(?string $color, string $default = '#94A3B8'): string
+{
+    return is_string($color) && preg_match('/^#[0-9a-f]{6}$/i', $color) === 1 ? $color : $default;
+}
+
+/**
  * Número con formato español: 7.5 → "7,50".
  */
 function format_number(float $number, int $decimals = 2): string
@@ -451,6 +468,50 @@ function relative_day(string $date): string
 }
 
 /**
+ * Lunes y domingo de la semana de una fecha: ['2026-10-05', '2026-10-11'].
+ */
+function week_bounds(?string $date = null): array
+{
+    $day    = new DateTimeImmutable($date ?? 'today');
+    $monday = $day->modify('-' . ((int) $day->format('N') - 1) . ' days');
+
+    return [$monday->format('Y-m-d'), $monday->modify('+6 days')->format('Y-m-d')];
+}
+
+/**
+ * Rango de fechas corto: "5 – 11 oct" o "28 sep – 4 oct".
+ */
+function format_date_range(string $start, string $end): string
+{
+    $from = new DateTimeImmutable($start);
+    $to   = new DateTimeImmutable($end);
+    $month = static fn (DateTimeImmutable $d): string => str_take(MONTH_NAMES[(int) $d->format('n')], 3);
+
+    return $from->format('n') === $to->format('n')
+        ? $from->format('j') . ' – ' . $to->format('j') . ' ' . $month($to)
+        : $from->format('j') . ' ' . $month($from) . ' – ' . $to->format('j') . ' ' . $month($to);
+}
+
+/**
+ * Datos para una cuenta atrás hasta una fecha y hora (sin hora: las 00:00).
+ * 'target' va en ISO 8601 con zona horaria para que JavaScript lo interprete bien.
+ */
+function countdown_parts(string $date, ?string $time = null): array
+{
+    $target  = new DateTimeImmutable($date . ' ' . ($time ?: '00:00:00'));
+    $seconds = max(0, $target->getTimestamp() - time());
+
+    return [
+        'target'   => $target->format(DATE_ATOM),
+        'days'     => intdiv($seconds, 86400),
+        'hours'    => intdiv($seconds % 86400, 3600),
+        'minutes'  => intdiv($seconds % 3600, 60),
+        'seconds'  => $seconds % 60,
+        'finished' => $seconds === 0,
+    ];
+}
+
+/**
  * Saludo según la hora del día.
  */
 function greeting(): string
@@ -499,6 +560,17 @@ function render(string $view, array $data = [], string $layout = 'app'): void
         throw $e;
     }
     ob_end_flush();
+}
+
+/**
+ * Pinta un fragmento reutilizable de /views/partials (estado vacío, cuenta atrás…).
+ *
+ *   partial('empty', ['icon' => 'ri-book-2-line', 'title' => 'Sin asignaturas']);
+ */
+function partial(string $name, array $data = []): void
+{
+    extract($data, EXTR_SKIP);
+    require BASE_PATH . '/views/partials/' . $name . '.php';
 }
 
 /**

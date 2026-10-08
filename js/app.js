@@ -7,6 +7,7 @@
  * - Mostrar/ocultar contraseña y medidor de seguridad
  * - Evitar envíos dobles de formularios
  * - Sombra de la barra superior al hacer scroll
+ * - Cuentas atrás de exámenes
  */
 'use strict';
 
@@ -186,6 +187,48 @@ const App = (() => {
     onScroll();
   }
 
+  /* ---------- Cuenta atrás ----------
+   * <div data-countdown="2026-10-11T10:00:00+02:00">
+   *   <span data-unit="days"></span> <span data-unit="hours"></span> …
+   * </div>
+   * <p data-countdown-done hidden>¡Es hoy!</p>   ← se muestra al llegar a 0
+   */
+  function initCountdowns() {
+    $$('[data-countdown]').forEach((el) => {
+      const target = new Date(el.dataset.countdown).getTime();
+      if (Number.isNaN(target)) return;
+
+      const units = {
+        days: $('[data-unit="days"]', el),
+        hours: $('[data-unit="hours"]', el),
+        minutes: $('[data-unit="minutes"]', el),
+        seconds: $('[data-unit="seconds"]', el),
+      };
+      const doneMessage = el.parentElement && $('[data-countdown-done]', el.parentElement);
+      const pad = (n) => String(n).padStart(2, '0');
+      let timer = null;
+
+      const tick = () => {
+        const diff = Math.max(0, Math.floor((target - Date.now()) / 1000));
+
+        if (diff === 0) {
+          el.hidden = true;
+          if (doneMessage) doneMessage.hidden = false;
+          clearInterval(timer);
+          return false;
+        }
+
+        if (units.days) units.days.textContent = Math.floor(diff / 86400);
+        if (units.hours) units.hours.textContent = pad(Math.floor((diff % 86400) / 3600));
+        if (units.minutes) units.minutes.textContent = pad(Math.floor((diff % 3600) / 60));
+        if (units.seconds) units.seconds.textContent = pad(diff % 60);
+        return true;
+      };
+
+      if (tick()) timer = setInterval(tick, 1000);
+    });
+  }
+
   /* ---------- Arranque ---------- */
   // El script se carga con "defer": el DOM ya está disponible.
   initSidebar();
@@ -194,6 +237,7 @@ const App = (() => {
   initPasswordStrength();
   initFormLoading();
   initTopbar();
+  initCountdowns();
 
   return { $, $$, toast };
 })();
