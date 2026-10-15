@@ -2744,6 +2744,13 @@ a.grade-mini__subject:hover {
   box-shadow: inset 3px 0 0 var(--c-danger);
 }
 
+/* Tareas para hoy: igual, en ámbar */
+.task.is-today {
+  background: var(--c-warning-soft);
+  background: color-mix(in srgb, var(--c-warning) 7%, var(--c-surface));
+  box-shadow: inset 3px 0 0 var(--c-warning);
+}
+
 /* Botón circular para completar (área táctil ampliada con ::after) */
 .task__check {
   position: relative;

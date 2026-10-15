@@ -127,7 +127,7 @@ $activeFilters = count($listFilters);
           $isToday   = !$isDone && $due === $today;
           $editUrl   = task_list_url(['action' => 'edit', 'id' => (int) $task['id']] + $filters);
         ?>
-        <li class="task<?= $isOverdue ? ' is-overdue' : '' ?><?= $isDone ? ' is-done' : '' ?>">
+        <li class="task<?= $isOverdue ? ' is-overdue' : '' ?><?= $isToday ? ' is-today' : '' ?><?= $isDone ? ' is-done' : '' ?>">
           <form method="post" action="tasks.php" class="inline-form" data-loading>
             <?= csrf_field() ?>
             <input type="hidden" name="action" value="toggle">
