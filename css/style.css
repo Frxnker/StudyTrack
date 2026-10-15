@@ -1394,6 +1394,7 @@ button, input, select, textarea {
 .alert--info    { background: var(--c-info-soft);    color: var(--c-info-text); }
 
 .toasts {
+  --toast-from: -14px; /* desde dónde entra el aviso (arriba) */
   position: fixed;
   top: calc(var(--topbar-h) + .5rem);
   right: 1rem;
@@ -1403,6 +1404,19 @@ button, input, select, textarea {
   flex-direction: column;
   gap: .5rem;
   pointer-events: none;
+}
+
+/* En la app (móvil y tablet) los avisos salen abajo, encima de la navegación
+   inferior, para no tapar el saludo ni el contenido; si hay botón "+", a su izquierda.
+   En escritorio vuelven arriba a la derecha (responsive.css). */
+.layout-app .toasts {
+  --toast-from: 14px;
+  top: auto;
+  bottom: calc(var(--bottomnav-h) + var(--safe-bottom) + 1rem);
+}
+
+.layout-app:has(.fab) .toasts {
+  right: calc(1rem + 58px + .75rem); /* ancho del .fab + hueco */
 }
 
 .toast {
@@ -4042,7 +4056,7 @@ a.grade-mini__subject:hover {
 }
 
 @keyframes toast-in {
-  from { opacity: 0; transform: translateY(-14px) scale(.98); }
+  from { opacity: 0; transform: translateY(var(--toast-from, -14px)) scale(.98); }
   to   { opacity: 1; transform: none; }
 }
 
@@ -4052,7 +4066,7 @@ a.grade-mini__subject:hover {
 }
 
 @keyframes toast-out {
-  to { opacity: 0; transform: translateY(-10px) scale(.98); }
+  to { opacity: 0; transform: translateY(calc(var(--toast-from, -14px) * .7)) scale(.98); }
 }
 
 @keyframes fade-in {

@@ -312,9 +312,13 @@
     grid-column: auto;
   }
 
-  .toasts {
+  .toasts,
+  .layout-app .toasts,
+  .layout-app:has(.fab) .toasts {
+    --toast-from: -14px;
     top: 84px;
     right: 2rem;
+    bottom: auto;
   }
 
   /* Login / registro: pantalla dividida en dos mitades */

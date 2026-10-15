@@ -75,14 +75,10 @@ $passedPct    = $gradedCount > 0 ? (int) round($passedCount / $gradedCount * 100
         <span class="stat__value" data-count-up="<?= $taskCounts['atrasadas'] ?>"><?= $taskCounts['atrasadas'] ?></span>
         <span class="stat__label">Atrasadas</span>
       </a>
-      <a href="grades.php" class="stat stat--success">
-        <span class="stat__icon"><i class="ri-medal-line" aria-hidden="true"></i></span>
-        <?php if ($overallAverage === null): ?>
-          <span class="stat__value">—</span>
-        <?php else: ?>
-          <span class="stat__value" data-count-up="<?= round($overallAverage, 2) ?>" data-decimals="2"><?= e(format_grade($overallAverage)) ?></span>
-        <?php endif; ?>
-        <span class="stat__label">Media general</span>
+      <a href="exams.php" class="stat stat--success">
+        <span class="stat__icon"><i class="ri-calendar-event-line" aria-hidden="true"></i></span>
+        <span class="stat__value" data-count-up="<?= $week['examenes'] ?>"><?= $week['examenes'] ?></span>
+        <span class="stat__label">Exámenes esta semana</span>
       </a>
     </section>
 

@@ -29,8 +29,15 @@ $navSections = [
 
 $bottomNav = ['dashboard', 'tasks', 'calendar', 'statistics', 'profile'];
 
-// Secciones que "pertenecen" a una pestaña de la barra inferior
-$bottomNavParent = ['exams' => 'calendar', 'schedule' => 'calendar', 'grades' => 'statistics'];
+// Secciones sin pestaña propia en la barra inferior: se marca la pestaña "padre"
+// (todas las secciones dejan así alguna pestaña activa)
+$bottomNavParent = [
+    'subjects' => 'dashboard',   // el inicio resume las asignaturas
+    'exams'    => 'calendar',
+    'schedule' => 'calendar',
+    'grades'   => 'statistics',
+    'goals'    => 'statistics',  // el progreso de los objetivos está en estadísticas
+];
 
 $activePage = current_page();
 $activeTab  = $bottomNavParent[$activePage] ?? $activePage;
@@ -89,7 +96,7 @@ $navItems = array_merge(...array_values($navSections));
     <?php $isActive = $page === $activeTab; ?>
     <a href="<?= e($page) ?>.php"
        class="bottom-nav__item<?= $isActive ? ' is-active' : '' ?>"
-       <?= $isActive ? 'aria-current="page"' : '' ?>>
+       <?= $page === $activePage ? 'aria-current="page"' : ($isActive ? 'aria-current="true"' : '') ?>>
       <i class="<?= e($icon . ($isActive ? '-fill' : '-line')) ?>" aria-hidden="true"></i>
       <span><?= e($label) ?></span>
     </a>
