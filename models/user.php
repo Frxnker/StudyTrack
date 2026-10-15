@@ -6,6 +6,8 @@
 
 declare(strict_types=1);
 
+const USER_THEMES = ['sistema' => 'Sistema', 'claro' => 'Claro', 'oscuro' => 'Oscuro'];
+
 /**
  * Busca un usuario por id (sin el hash de la contraseña).
  */
@@ -72,4 +74,48 @@ function user_update_password(int $id, string $password): void
 function user_touch_last_access(int $id): void
 {
     db_execute('UPDATE usuarios SET ultimo_acceso = NOW() WHERE id = :id', ['id' => $id]);
+}
+
+/**
+ * ¿La contraseña es la del usuario? (para cambiarla o borrar la cuenta)
+ */
+function user_check_password(int $id, string $password): bool
+{
+    $hash = db_value('SELECT password_hash FROM usuarios WHERE id = :id', ['id' => $id]);
+
+    return is_string($hash) && password_verify($password, $hash);
+}
+
+/**
+ * Actualiza los datos personales. $data: nombre, email, curso, centro.
+ */
+function user_update_profile(int $id, array $data): void
+{
+    db_execute(
+        'UPDATE usuarios SET nombre = :nombre, email = :email, curso = :curso, centro = :centro WHERE id = :id',
+        [
+            'nombre' => $data['nombre'],
+            'email'  => $data['email'],
+            'curso'  => nullable($data['curso']),
+            'centro' => nullable($data['centro']),
+            'id'     => $id,
+        ]
+    );
+}
+
+/**
+ * Cambia el tema de la interfaz: sistema, claro u oscuro.
+ */
+function user_update_theme(int $id, string $theme): void
+{
+    db_execute('UPDATE usuarios SET tema = :tema WHERE id = :id', ['tema' => $theme, 'id' => $id]);
+}
+
+/**
+ * Borra la cuenta. Las claves foráneas (ON DELETE CASCADE) borran también
+ * sus asignaturas, tareas, exámenes, notas, horario y objetivos.
+ */
+function user_delete(int $id): void
+{
+    db_execute('DELETE FROM usuarios WHERE id = :id', ['id' => $id]);
 }

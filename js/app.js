@@ -7,6 +7,7 @@
  * - Mostrar/ocultar contraseña y medidor de seguridad
  * - Evitar envíos dobles de formularios
  * - Confirmación antes de borrar, selector de color y filtros
+ * - Vista previa del tema claro/oscuro
  * - Sombra de la barra superior al hacer scroll
  * - Cuentas atrás de exámenes
  */
@@ -290,6 +291,17 @@ const App = (() => {
     }
   }
 
+  /* ---------- Vista previa del tema (perfil) ----------
+   * Al elegir un tema se aplica al momento; se guarda al enviar el formulario.
+   */
+  function initThemePreview() {
+    $$('input[data-theme-preview]').forEach((radio) => {
+      radio.addEventListener('change', () => {
+        if (radio.checked) document.documentElement.dataset.theme = radio.value;
+      });
+    });
+  }
+
   /* ---------- Barra superior ---------- */
   function initTopbar() {
     const topbar = $('.topbar');
@@ -351,6 +363,7 @@ const App = (() => {
   initConfirm();
   initColorPickers();
   initFilters();
+  initThemePreview();
   initTopbar();
   initCountdowns();
 

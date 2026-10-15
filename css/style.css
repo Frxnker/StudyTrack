@@ -5,7 +5,7 @@
    carga después de este archivo.
 
    Índice
-   1.  Variables (design tokens)
+   1.  Variables (design tokens) y tema oscuro
    2.  Reset y estilos base
    3.  Utilidades
    4.  Estructura de la app (topbar, sidebar, navegación inferior, FAB)
@@ -25,7 +25,8 @@
    18. Horario y calendario
    19. Objetivos
    20. Estadísticas
-   21. Animaciones
+   21. Perfil
+   22. Animaciones
    ========================================================================== */
 
 
@@ -100,6 +101,80 @@
   --dur: 180ms;
 
   color-scheme: light;
+}
+
+/* --- Tema oscuro ---
+   Se aplica con data-theme="oscuro" (elegido en el perfil) o con "sistema"
+   cuando el dispositivo está en modo oscuro. Los dos bloques son iguales:
+   CSS no permite compartir declaraciones entre un selector y una media query. */
+:root[data-theme="oscuro"] {
+  --c-primary: #6d73f5;
+  --c-primary-hover: #5b61ea;
+  --c-primary-soft: rgb(109 115 245 / .16);
+  --c-accent: #8b5cf6;
+  --c-bg: #0b1120;
+  --c-surface: #131b2e;
+  --c-surface-2: #172036;
+  --c-surface-3: #1f2a40;
+  --c-border: #253149;
+  --c-border-strong: #364560;
+  --c-text: #e5eaf3;
+  --c-text-2: #a7b3c7;
+  --c-text-3: #6f7d94;
+  --c-success: #22c55e;
+  --c-success-soft: rgb(34 197 94 / .15);
+  --c-success-text: #86efac;
+  --c-warning: #f59e0b;
+  --c-warning-soft: rgb(245 158 11 / .15);
+  --c-warning-text: #fcd34d;
+  --c-danger: #f05252;
+  --c-danger-soft: rgb(240 82 82 / .15);
+  --c-danger-text: #fca5a5;
+  --c-info: #38bdf8;
+  --c-info-soft: rgb(56 189 248 / .15);
+  --c-info-text: #7dd3fc;
+  --shadow-xs: 0 1px 2px rgb(0 0 0 / .3);
+  --shadow-sm: 0 1px 3px rgb(0 0 0 / .4), 0 1px 2px rgb(0 0 0 / .3);
+  --shadow-md: 0 10px 24px -8px rgb(0 0 0 / .55);
+  --shadow-lg: 0 24px 48px -16px rgb(0 0 0 / .7);
+  --ring: 0 0 0 4px rgb(109 115 245 / .3);
+  color-scheme: dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="claro"]):not([data-theme="oscuro"]) {
+    --c-primary: #6d73f5;
+    --c-primary-hover: #5b61ea;
+    --c-primary-soft: rgb(109 115 245 / .16);
+    --c-accent: #8b5cf6;
+    --c-bg: #0b1120;
+    --c-surface: #131b2e;
+    --c-surface-2: #172036;
+    --c-surface-3: #1f2a40;
+    --c-border: #253149;
+    --c-border-strong: #364560;
+    --c-text: #e5eaf3;
+    --c-text-2: #a7b3c7;
+    --c-text-3: #6f7d94;
+    --c-success: #22c55e;
+    --c-success-soft: rgb(34 197 94 / .15);
+    --c-success-text: #86efac;
+    --c-warning: #f59e0b;
+    --c-warning-soft: rgb(245 158 11 / .15);
+    --c-warning-text: #fcd34d;
+    --c-danger: #f05252;
+    --c-danger-soft: rgb(240 82 82 / .15);
+    --c-danger-text: #fca5a5;
+    --c-info: #38bdf8;
+    --c-info-soft: rgb(56 189 248 / .15);
+    --c-info-text: #7dd3fc;
+    --shadow-xs: 0 1px 2px rgb(0 0 0 / .3);
+    --shadow-sm: 0 1px 3px rgb(0 0 0 / .4), 0 1px 2px rgb(0 0 0 / .3);
+    --shadow-md: 0 10px 24px -8px rgb(0 0 0 / .55);
+    --shadow-lg: 0 24px 48px -16px rgb(0 0 0 / .7);
+    --ring: 0 0 0 4px rgb(109 115 245 / .3);
+    color-scheme: dark;
+  }
 }
 
 
@@ -3689,7 +3764,41 @@ a.calendar__day:hover {
 }
 
 
-/* 21. Animaciones
+/* 21. Perfil
+   ========================================================================== */
+.profile > * + * {
+  margin-top: 1rem;
+}
+
+.profile-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  max-width: 760px;
+}
+
+.profile-card__info {
+  min-width: 0;
+}
+
+.profile-card__name {
+  font-size: 1.25rem;
+  font-weight: 800;
+  overflow-wrap: anywhere;
+}
+
+.profile-card__email {
+  color: var(--c-text-2);
+  font-size: .9rem;
+  overflow-wrap: anywhere;
+}
+
+.danger-zone .card__title i {
+  color: var(--c-danger);
+}
+
+
+/* 22. Animaciones
    ========================================================================== */
 @keyframes page-in {
   from { opacity: 0; transform: translateY(8px); }

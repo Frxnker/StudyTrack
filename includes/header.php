@@ -11,6 +11,9 @@
  */
 
 $pageTitle = $pageTitle ?? APP_NAME;
+
+// Tema elegido en el perfil (sistema | claro | oscuro); sin sesión, el del dispositivo
+$theme = $currentUser['tema'] ?? 'sistema';
 $toastIcons = [
     'success' => 'ri-checkbox-circle-fill',
     'error'   => 'ri-error-warning-fill',
@@ -19,11 +22,12 @@ $toastIcons = [
 ];
 ?>
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" data-theme="<?= e($theme) ?>">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="description" content="StudyTrack: organiza tus asignaturas, tareas, exámenes, notas y horario en un solo lugar.">
+  <meta name="color-scheme" content="<?= $theme === 'claro' ? 'light' : ($theme === 'oscuro' ? 'dark' : 'light dark') ?>">
   <meta name="theme-color" content="#4f46e5">
   <title><?= e($pageTitle) ?> · <?= e(APP_NAME) ?></title>
 
