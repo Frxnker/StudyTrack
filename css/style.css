@@ -24,7 +24,8 @@
    17. Notas
    18. Horario y calendario
    19. Objetivos
-   20. Animaciones
+   20. Estadísticas
+   21. Animaciones
    ========================================================================== */
 
 
@@ -3408,7 +3409,287 @@ a.calendar__day:hover {
 }
 
 
-/* 20. Animaciones
+/* 20. Estadísticas
+   ==========================================================================
+   Los gráficos los dibuja js/statistics.js; aquí solo van colores y tipografía,
+   así se adaptan al tema sin tocar el JavaScript. */
+.chart-grid {
+  display: grid;
+  gap: 1rem;
+}
+
+.chart-card {
+  min-width: 0;
+}
+
+.chart svg {
+  display: block;
+  max-width: 100%;
+  overflow: visible;
+  font-family: var(--font-sans);
+}
+
+.chart text {
+  fill: var(--c-text-3);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.chart .chart__label {
+  fill: var(--c-text);
+  font-size: 12px;
+}
+
+.chart .chart__value {
+  fill: var(--c-text);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.chart .chart__value.is-fail {
+  fill: var(--c-danger);
+}
+
+.chart .chart__tick.is-current {
+  fill: var(--c-primary);
+}
+
+.chart__grid line {
+  stroke: var(--c-border);
+  stroke-width: 1;
+}
+
+.chart__axis {
+  stroke: var(--c-border-strong);
+  stroke-width: 1;
+}
+
+.chart__pass {
+  stroke: var(--c-danger);
+  stroke-dasharray: 4 4;
+  stroke-width: 1.5;
+  opacity: .7;
+}
+
+.chart__bar {
+  transform-box: fill-box;
+  transform-origin: left center;
+  animation: bar-grow-x .8s var(--ease-out) both;
+}
+
+.chart__col {
+  fill: var(--c-primary);
+  transform-box: fill-box;
+  transform-origin: bottom;
+  animation: bar-grow .8s var(--ease-out) both;
+}
+
+.chart__col.is-current {
+  fill: var(--c-accent);
+}
+
+.chart__col.is-empty {
+  fill: var(--c-surface-3);
+}
+
+.chart__bar:hover,
+.chart__col:hover,
+.chart__point:hover,
+.chart__slice:hover {
+  opacity: .8;
+}
+
+.chart__line {
+  fill: none;
+  stroke: var(--c-primary);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 1;
+  animation: line-draw 1.2s var(--ease-out) both;
+}
+
+.chart__area {
+  fill: var(--c-primary);
+  opacity: .08;
+}
+
+.chart__point {
+  stroke: var(--c-surface);
+  stroke-width: 2;
+  animation: fade-in .4s var(--ease) both;
+}
+
+.chart__track {
+  fill: none;
+  stroke: var(--c-surface-3);
+}
+
+.chart__slice {
+  fill: none;
+  animation: fade-in .6s var(--ease) both;
+}
+
+.chart__slice--pendiente   { stroke: var(--c-warning); }
+.chart__slice--en_progreso { stroke: var(--c-info); }
+.chart__slice--completada  { stroke: var(--c-success); }
+
+.chart .chart__donut-value {
+  fill: var(--c-text);
+  font-size: 30px;
+  font-weight: 800;
+}
+
+.chart .chart__donut-label {
+  fill: var(--c-text-2);
+  font-size: 12px;
+}
+
+/* Al redibujar (cambio de ancho) no se repiten las animaciones */
+.chart.is-static * {
+  animation: none !important;
+}
+
+/* Leyendas */
+.chart-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .4rem 1.1rem;
+  margin-top: .75rem;
+  color: var(--c-text-2);
+  font-size: .8rem;
+}
+
+.chart-legend li {
+  display: inline-flex;
+  align-items: center;
+  gap: .4rem;
+}
+
+.chart-legend__dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: conic-gradient(#4f46e5 0 25%, #0ea5e9 0 50%, #10b981 0 75%, #f59e0b 0);
+}
+
+.chart-legend__line {
+  width: 18px;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--c-primary);
+}
+
+.chart-legend__line--pass {
+  height: 0;
+  border-top: 2px dashed var(--c-danger);
+  background: none;
+}
+
+.donut-layout {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 1.25rem 2rem;
+}
+
+.status-legend {
+  display: flex;
+  flex: 1 1 200px;
+  flex-direction: column;
+  gap: .25rem;
+}
+
+.status-legend__item {
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+  padding: .55rem .6rem;
+  border-radius: var(--radius-sm);
+  color: var(--c-text);
+  font-size: .9rem;
+}
+
+.status-legend__item:hover {
+  background: var(--c-surface-2);
+  text-decoration: none;
+}
+
+.status-legend__swatch {
+  flex-shrink: 0;
+  width: 12px;
+  height: 12px;
+  border-radius: 4px;
+}
+
+.status-legend__swatch--pendiente   { background: var(--c-warning); }
+.status-legend__swatch--en_progreso { background: var(--c-info); }
+.status-legend__swatch--completada  { background: var(--c-success); }
+
+.status-legend__label {
+  flex: 1;
+  font-weight: 600;
+}
+
+.status-legend__value {
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.status-legend__pct {
+  min-width: 3ch;
+  color: var(--c-text-3);
+  font-size: .8rem;
+  text-align: right;
+}
+
+/* Tabla de datos plegable bajo cada gráfico */
+.chart__data {
+  margin-top: .85rem;
+  padding-top: .65rem;
+  border-top: 1px solid var(--c-border);
+}
+
+.chart__data summary {
+  width: fit-content;
+  color: var(--c-primary);
+  font-size: .8rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.data-table {
+  width: 100%;
+  margin-top: .6rem;
+  border-collapse: collapse;
+  font-size: .82rem;
+}
+
+.data-table th,
+.data-table td {
+  padding: .4rem .5rem;
+  border-bottom: 1px solid var(--c-border);
+  text-align: left;
+}
+
+.data-table thead th {
+  color: var(--c-text-2);
+  font-size: .72rem;
+  letter-spacing: .03em;
+  text-transform: uppercase;
+}
+
+.data-table tbody th {
+  font-weight: 600;
+}
+
+.data-table td {
+  font-variant-numeric: tabular-nums;
+}
+
+
+/* 21. Animaciones
    ========================================================================== */
 @keyframes page-in {
   from { opacity: 0; transform: translateY(8px); }
@@ -3452,6 +3733,15 @@ a.calendar__day:hover {
   from { transform: scaleY(0); }
 }
 
+@keyframes bar-grow-x {
+  from { transform: scaleX(0); }
+}
+
+@keyframes line-draw {
+  from { stroke-dashoffset: 1; }
+  to   { stroke-dashoffset: 0; }
+}
+
 @keyframes ring-fill {
   from { stroke-dashoffset: var(--circ); }
 }
@@ -3466,6 +3756,7 @@ a.calendar__day:hover {
   *::before,
   *::after {
     animation-duration: .01ms !important;
+    animation-delay: 0s !important;
     animation-iteration-count: 1 !important;
     transition-duration: .01ms !important;
     scroll-behavior: auto !important;

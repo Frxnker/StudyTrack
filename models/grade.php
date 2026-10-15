@@ -94,6 +94,21 @@ function grade_list(int $userId, int $subjectId = 0): array
 }
 
 /**
+ * Notas en orden cronológico (para la gráfica de evolución), con su asignatura.
+ */
+function grade_timeline(int $userId): array
+{
+    return db_all(
+        'SELECT n.nota, n.fecha, n.tipo, a.nombre AS asignatura, a.color
+           FROM notas n
+           JOIN asignaturas a ON a.id = n.asignatura_id
+          WHERE n.usuario_id = :uid
+          ORDER BY n.fecha ASC, n.id ASC',
+        ['uid' => $userId]
+    );
+}
+
+/**
  * Media, nº de notas, mejor y peor nota de cada asignatura (también las que aún no tienen notas).
  */
 function grade_subject_averages(int $userId): array

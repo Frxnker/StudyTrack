@@ -346,6 +346,11 @@
     border-top: 0;
   }
 
+  /* Estadísticas: gráficos en dos columnas */
+  .chart-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   /* Horario: rejilla semanal en lugar de la lista por día */
   .timetable-card {
     display: block;

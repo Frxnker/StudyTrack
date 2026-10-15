@@ -297,6 +297,41 @@ function task_week_progress(int $userId, string $start, string $end): array
 }
 
 /**
+ * Número de tareas en cada estado: ['pendiente' => 5, 'en_progreso' => 2, 'completada' => 4].
+ */
+function task_status_counts(int $userId): array
+{
+    $rows = db_all(
+        'SELECT estado, COUNT(*) AS total FROM tareas WHERE usuario_id = :uid GROUP BY estado',
+        ['uid' => $userId]
+    );
+    $counts = array_column($rows, 'total', 'estado');
+
+    return array_map(
+        static fn (string $status): int => (int) ($counts[$status] ?? 0),
+        array_combine(array_keys(TASK_STATUSES), array_keys(TASK_STATUSES))
+    );
+}
+
+/**
+ * Tareas completadas en cada una de las últimas $weeks semanas (de lunes a domingo),
+ * de la más antigua a la actual: ['2026-08-24' => 3, …] (la clave es el lunes).
+ */
+function task_completed_by_week(int $userId, int $weeks = 8): array
+{
+    [$currentMonday, $currentSunday] = week_bounds();
+    $firstMonday = (new DateTimeImmutable($currentMonday))->modify('-' . ($weeks - 1) . ' weeks')->format('Y-m-d');
+
+    $result = [];
+    foreach (task_completed_by_day($userId, $firstMonday, $currentSunday) as $day => $count) {
+        $monday = week_bounds($day)[0];
+        $result[$monday] = ($result[$monday] ?? 0) + $count;
+    }
+
+    return $result;
+}
+
+/**
  * Tareas completadas cada día entre dos fechas: ['2026-10-05' => 2, '2026-10-06' => 0, …]
  */
 function task_completed_by_day(int $userId, string $start, string $end): array
