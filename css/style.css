@@ -23,7 +23,8 @@
    16. Exámenes
    17. Notas
    18. Horario y calendario
-   19. Animaciones
+   19. Objetivos
+   20. Animaciones
    ========================================================================== */
 
 
@@ -759,6 +760,15 @@ button, input, select, textarea {
 .form-row {
   display: grid;
   gap: 1.1rem;
+}
+
+/* Fila de 3 campos: en móvil, dos arriba y el tercero debajo a lo ancho */
+.form-row--3 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.form-row--3 > :last-child {
+  grid-column: 1 / -1;
 }
 
 .form-actions {
@@ -3238,7 +3248,167 @@ a.calendar__day:hover {
 }
 
 
-/* 19. Animaciones
+/* 19. Objetivos
+   ========================================================================== */
+.goal-grid {
+  display: grid;
+  gap: 1rem;
+}
+
+.goal-card {
+  display: flex;
+  flex-direction: column;
+  gap: .85rem;
+  scroll-margin-top: calc(var(--topbar-h) + 1rem);
+  transition: border-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
+}
+
+/* Objetivo recién modificado (goals.php#objetivo-N) */
+.goal-card:target {
+  border-color: var(--c-primary);
+  box-shadow: var(--ring);
+}
+
+.goal-card.is-complete {
+  background: var(--c-success-soft);
+  background: color-mix(in srgb, var(--c-success) 5%, var(--c-surface));
+}
+
+.goal-card.is-overdue {
+  border-color: color-mix(in srgb, var(--c-danger) 35%, var(--c-border));
+}
+
+.goal-card__header {
+  display: flex;
+  align-items: flex-start;
+  gap: .75rem;
+}
+
+.goal-card__heading {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: .4rem;
+  min-width: 0;
+}
+
+.goal-card__title {
+  font-size: 1.02rem;
+  overflow-wrap: anywhere;
+}
+
+.goal-card__actions {
+  display: flex;
+  flex-shrink: 0;
+  gap: .1rem;
+  margin: -.35rem -.4rem 0 0;
+}
+
+.goal-card__desc {
+  color: var(--c-text-2);
+  font-size: .875rem;
+}
+
+.goal-card__numbers {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: .5rem;
+  margin-bottom: .45rem;
+  color: var(--c-text-2);
+  font-size: .9rem;
+}
+
+.goal-card__numbers strong {
+  color: var(--c-text);
+  font-size: 1.4rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.goal-card__percent {
+  color: var(--c-primary);
+  font-weight: 800;
+}
+
+.goal-card.is-complete .goal-card__percent {
+  color: var(--c-success);
+}
+
+.goal-card__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: .75rem;
+  margin-top: auto;
+  padding-top: .85rem;
+  border-top: 1px solid var(--c-border);
+  color: var(--c-text-2);
+  font-size: .85rem;
+}
+
+/* Botones − / + */
+.stepper {
+  display: flex;
+  flex-shrink: 0;
+  gap: .4rem;
+}
+
+.stepper__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: .1rem;
+  min-width: 44px;
+  height: 44px;
+  padding: 0 .6rem;
+  border: 1.5px solid var(--c-border);
+  border-radius: var(--radius);
+  background: var(--c-surface);
+  color: var(--c-text);
+  font-size: 1.2rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background var(--dur) var(--ease), border-color var(--dur) var(--ease), transform var(--dur) var(--ease);
+}
+
+.stepper__btn span {
+  font-size: .85rem;
+}
+
+.stepper__btn:hover:not(:disabled) {
+  border-color: var(--c-border-strong);
+  background: var(--c-surface-2);
+}
+
+.stepper__btn:active:not(:disabled) {
+  transform: scale(.94);
+}
+
+.stepper__btn--plus {
+  border-color: transparent;
+  background: var(--c-primary);
+  color: #fff;
+}
+
+.stepper__btn--plus:hover:not(:disabled) {
+  border-color: transparent;
+  background: var(--c-primary-hover);
+}
+
+.stepper__btn:disabled {
+  cursor: not-allowed;
+  opacity: .4;
+}
+
+.stepper__btn.is-loading {
+  opacity: .6;
+  pointer-events: none;
+}
+
+
+/* 20. Animaciones
    ========================================================================== */
 @keyframes page-in {
   from { opacity: 0; transform: translateY(8px); }
