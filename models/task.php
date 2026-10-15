@@ -117,6 +117,22 @@ function task_filter_sql(int $userId, array $filters): array
 }
 
 /**
+ * Tareas con fecha límite entre dos fechas (para el calendario), con el color de su asignatura.
+ */
+function task_between(int $userId, string $start, string $end): array
+{
+    return db_all(
+        "SELECT t.id, t.titulo, t.fecha_limite, t.prioridad, t.estado, a.nombre AS asignatura, a.color
+           FROM tareas t
+           LEFT JOIN asignaturas a ON a.id = t.asignatura_id
+          WHERE t.usuario_id = :uid
+            AND t.fecha_limite BETWEEN :inicio AND :fin
+          ORDER BY t.fecha_limite, t.estado = 'completada', FIELD(t.prioridad, 'alta', 'media', 'baja')",
+        ['uid' => $userId, 'inicio' => $start, 'fin' => $end]
+    );
+}
+
+/**
  * Una tarea del usuario o null si no existe (o es de otro usuario).
  */
 function task_find(int $userId, int $id): ?array
