@@ -2948,51 +2948,81 @@ a.grade-mini__subject:hover {
 
 /* 17. Notas
    ========================================================================== */
-.average-list {
-  display: flex;
-  flex-direction: column;
-  gap: .35rem;
+/* Un grupo por asignatura: cabecera con la media, barra y sus notas */
+.grade-groups {
+  display: grid;
+  gap: 1rem;
+  align-items: start;
 }
 
-.average {
-  display: flex;
-  flex-direction: column;
-  gap: .4rem;
-  margin: 0 -.6rem;
-  padding: .6rem;
-  border-radius: var(--radius);
+.grade-group {
+  border-top: 4px solid var(--subject);
 }
 
-.average.is-active {
-  background: var(--c-primary-soft);
-}
-
-.average__head {
+.grade-group__header {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
   gap: .75rem;
+  padding: 1rem 1rem .6rem;
 }
 
-.average__name {
-  display: flex;
-  align-items: center;
-  gap: .45rem;
+.grade-group__heading {
   min-width: 0;
-  color: var(--c-text);
-  font-size: .92rem;
-  font-weight: 600;
-  overflow-wrap: anywhere;
 }
 
-.average__name:hover {
+.grade-group__name {
+  font-size: 1.05rem;
+}
+
+.grade-group__name a {
+  color: inherit;
+}
+
+.grade-group__name a:hover {
   color: var(--c-primary);
   text-decoration: none;
 }
 
-.average__meta {
+.grade-group__meta {
+  margin-top: .2rem;
   color: var(--c-text-3);
-  font-size: .75rem;
+  font-size: .78rem;
+}
+
+.grade-group__average {
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  align-items: flex-end;
+  gap: .35rem;
+}
+
+.grade-group__bar {
+  padding: 0 1rem .85rem;
+  border-bottom: 1px solid var(--c-border);
+}
+
+.grade-group__footer {
+  padding: .75rem 1rem;
+  border-top: 1px solid var(--c-border);
+}
+
+.grade-row__type {
+  font-size: .92rem;
+  font-weight: 600;
+}
+
+.ungraded__list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .5rem;
+  margin-top: .75rem;
+}
+
+.ungraded__list .chip:hover {
+  text-decoration: none;
+  filter: brightness(.95);
 }
 
 .grade-list > li + li {

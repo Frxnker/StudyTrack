@@ -177,9 +177,27 @@ $averages = grade_subject_averages($userId);
 $graded   = array_filter($averages, static fn (array $s): bool => (int) $s['num_notas'] > 0);
 $passed   = array_filter($graded, static fn (array $s): bool => grade_passed($s['media']));
 
+// Notas agrupadas por asignatura: [id => asignatura + media + 'notas' => [...]]
+$groups = [];
+foreach ($graded as $subject) {
+    if ($subjectId === 0 || (int) $subject['id'] === $subjectId) {
+        $groups[(int) $subject['id']] = $subject + ['notas' => []];
+    }
+}
+foreach (grade_list($userId, $subjectId) as $grade) {
+    $groups[(int) $grade['asignatura_id']]['notas'][] = $grade;
+}
+
+// Asignaturas que aún no tienen ninguna nota (para invitar a añadirlas)
+$ungraded = array_values(array_filter(
+    $averages,
+    static fn (array $s): bool => (int) $s['num_notas'] === 0 && ($subjectId === 0 || (int) $s['id'] === $subjectId)
+));
+
 render('grades/index', [
     'pageTitle'      => 'Notas',
-    'grades'         => grade_list($userId, $subjectId),
+    'groups'         => $groups,
+    'ungraded'       => $ungraded,
     'averages'       => $averages,
     'overallAverage' => grade_overall_average($userId),
     'summary'        => grade_summary($userId),

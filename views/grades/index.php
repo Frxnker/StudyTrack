@@ -1,11 +1,10 @@
 <?php
 /**
- * Vista: resumen de notas, media por asignatura y listado de calificaciones.
+ * Vista: resumen de notas y notas agrupadas por asignatura, cada grupo con su media.
  *
- * En móvil las medias van primero; en escritorio pasan a una columna lateral (.split).
- *
- * @var array      $grades
- * @var array      $averages        id, nombre, color, media, num_notas, mejor, peor
+ * @var array      $groups          [id => id, nombre, color, media, num_notas, mejor, peor, notas]
+ * @var array      $ungraded        Asignaturas sin notas (id, nombre, color)
+ * @var array      $averages        Todas las asignaturas (para el filtro)
  * @var float|null $overallAverage
  * @var array      $summary         total, aprobadas
  * @var int        $gradedCount     Asignaturas con alguna nota
@@ -15,9 +14,6 @@
 
 $return       = $subjectId > 0 ? (string) $subjectId : '';
 $passedGrades = $summary['total'] > 0 ? (int) round($summary['aprobadas'] / $summary['total'] * 100) : 0;
-$filtered     = $subjectId > 0
-    ? (array_values(array_filter($averages, static fn (array $s): bool => (int) $s['id'] === $subjectId))[0] ?? null)
-    : null;
 $editUrl      = static fn (array $grade): string => 'grades.php?action=edit&id=' . (int) $grade['id']
                                                   . ($subjectId > 0 ? '&asignatura=' . $subjectId : '');
 ?>
@@ -91,110 +87,118 @@ $editUrl      = static fn (array $grade): string => 'grades.php?action=edit&id='
     </div>
   </section>
 
-  <div class="split">
-    <aside class="card split__side" aria-labelledby="averages-title">
-      <header class="card__header">
-        <h3 class="card__title" id="averages-title"><i class="ri-bar-chart-horizontal-line" aria-hidden="true"></i> Media por asignatura</h3>
-        <?php if ($subjectId > 0): ?>
-          <a href="grades.php" class="card__link">Ver todas</a>
-        <?php endif; ?>
-      </header>
+  <?php if ($subjectId > 0): ?>
+    <p class="mb-2"><a href="grades.php" class="card__link"><i class="ri-arrow-left-s-line" aria-hidden="true"></i> Ver todas las asignaturas</a></p>
+  <?php endif; ?>
 
-      <ul class="average-list">
-        <?php foreach ($averages as $subject): ?>
-          <?php
-            $hasGrades = (int) $subject['num_notas'] > 0;
-            $isPass    = $hasGrades && grade_passed($subject['media']);
-          ?>
-          <li class="average<?= $subjectId === (int) $subject['id'] ? ' is-active' : '' ?>"
-              style="--subject: <?= e(safe_color($subject['color'])) ?>">
-            <div class="average__head">
-              <a href="grades.php?asignatura=<?= (int) $subject['id'] ?>" class="average__name"
-                 <?= $subjectId === (int) $subject['id'] ? 'aria-current="true"' : '' ?>>
-                <span class="dot" aria-hidden="true"></span><?= e($subject['nombre']) ?>
-              </a>
-              <?php if ($hasGrades): ?>
-                <span class="grade-pill grade-pill--sm grade-pill--<?= $isPass ? 'pass' : 'fail' ?>"
-                      title="<?= $isPass ? 'Aprobada' : 'Suspensa' ?>">
-                  <?= e(format_grade($subject['media'])) ?>
-                </span>
-              <?php else: ?>
-                <span class="badge">Sin notas</span>
-              <?php endif; ?>
+  <?php if ($groups): ?>
+    <div class="grade-groups">
+      <?php foreach ($groups as $group): ?>
+        <?php
+          $id     = (int) $group['id'];
+          $isPass = grade_passed($group['media']);
+        ?>
+        <section class="card card--flush grade-group" style="--subject: <?= e(safe_color($group['color'])) ?>"
+                 aria-labelledby="group-<?= $id ?>">
+          <header class="grade-group__header">
+            <div class="grade-group__heading">
+              <h3 class="grade-group__name subject-title" id="group-<?= $id ?>">
+                <span class="subject-title__mark" aria-hidden="true"></span>
+                <a href="subjects.php?action=show&amp;id=<?= $id ?>"><?= e($group['nombre']) ?></a>
+              </h3>
+              <p class="grade-group__meta">
+                <?= e(plural((int) $group['num_notas'], 'nota', 'notas')) ?> ·
+                mejor <?= e(format_grade($group['mejor'])) ?> · peor <?= e(format_grade($group['peor'])) ?>
+              </p>
             </div>
-            <?php if ($hasGrades): ?>
-              <div class="progress progress--sm progress--mark" style="--mark: <?= PASS_MARK * 10 ?>%"
-                   role="progressbar" aria-label="Media de <?= e($subject['nombre']) ?>"
-                   aria-valuemin="0" aria-valuemax="10" aria-valuenow="<?= round((float) $subject['media'], 2) ?>">
-                <div class="progress__bar progress__bar--<?= $isPass ? 'success' : 'danger' ?>"
-                     style="--value: <?= round(min((float) $subject['media'], 10) * 10, 1) ?>%"></div>
-              </div>
-              <span class="average__meta">
-                <?= e(plural((int) $subject['num_notas'], 'nota', 'notas')) ?> ·
-                mejor <?= e(format_grade($subject['mejor'])) ?> · peor <?= e(format_grade($subject['peor'])) ?>
-              </span>
-            <?php endif; ?>
+            <div class="grade-group__average">
+              <span class="grade-pill grade-pill--<?= $isPass ? 'pass' : 'fail' ?>"><?= e(format_grade($group['media'])) ?></span>
+              <span class="badge badge--<?= $isPass ? 'success' : 'danger' ?>"><?= $isPass ? 'Aprobada' : 'Suspensa' ?></span>
+            </div>
+          </header>
+
+          <div class="grade-group__bar">
+            <div class="progress progress--sm progress--mark" style="--mark: <?= PASS_MARK * 10 ?>%"
+                 role="progressbar" aria-label="Media de <?= e($group['nombre']) ?>"
+                 aria-valuemin="0" aria-valuemax="10" aria-valuenow="<?= round((float) $group['media'], 2) ?>">
+              <div class="progress__bar progress__bar--<?= $isPass ? 'success' : 'danger' ?>"
+                   style="--value: <?= round(min((float) $group['media'], 10) * 10, 1) ?>%"></div>
+            </div>
+          </div>
+
+          <ul class="grade-list">
+            <?php foreach ($group['notas'] as $grade): ?>
+              <?php
+                $gradePass = grade_passed($grade['nota']);
+                $type      = GRADE_TYPES[$grade['tipo']] ?? $grade['tipo'];
+              ?>
+              <li class="grade-row">
+                <span class="grade-pill grade-pill--<?= $gradePass ? 'pass' : 'fail' ?>">
+                  <?= e(format_grade($grade['nota'])) ?>
+                  <span class="sr-only"><?= $gradePass ? '(aprobado)' : '(suspenso)' ?></span>
+                </span>
+                <div class="grade-row__body">
+                  <span class="grade-row__type"><?= e($type) ?></span>
+                  <span class="grade-mini__meta"><?= e(format_date($grade['fecha'])) ?></span>
+                  <?php if ($grade['comentarios']): ?>
+                    <p class="grade-row__comment"><?= e(truncate($grade['comentarios'], 140)) ?></p>
+                  <?php endif; ?>
+                </div>
+                <div class="grade-row__actions">
+                  <a href="<?= e($editUrl($grade)) ?>" class="icon-btn icon-btn--sm"
+                     aria-label="Editar la nota de <?= e(str_lower($type)) ?> del <?= e(format_date($grade['fecha'])) ?>" title="Editar">
+                    <i class="ri-pencil-line" aria-hidden="true"></i>
+                  </a>
+                  <?php partial('delete', [
+                      'action'   => 'grades.php',
+                      'id'       => (int) $grade['id'],
+                      'label'    => 'Eliminar la nota de ' . str_lower($type) . ' del ' . format_date($grade['fecha']),
+                      'question' => '¿Eliminar el ' . format_grade($grade['nota']) . ' de ' . $group['nombre'] . '?',
+                      'text'     => 'La media de la asignatura se recalculará. Esta acción no se puede deshacer.',
+                      'return'   => $return,
+                  ]); ?>
+                </div>
+              </li>
+            <?php endforeach; ?>
+          </ul>
+
+          <footer class="grade-group__footer">
+            <a href="grades.php?action=new&amp;asignatura=<?= $id ?>" class="card__link">
+              <i class="ri-add-line" aria-hidden="true"></i> Añadir nota de <?= e($group['nombre']) ?>
+            </a>
+          </footer>
+        </section>
+      <?php endforeach; ?>
+    </div>
+  <?php endif; ?>
+
+  <?php if ($ungraded): ?>
+    <section class="card mt-2 ungraded" aria-labelledby="ungraded-title">
+      <h3 class="card__title" id="ungraded-title"><i class="ri-hourglass-line" aria-hidden="true"></i> Sin notas todavía</h3>
+      <ul class="ungraded__list">
+        <?php foreach ($ungraded as $subject): ?>
+          <li>
+            <a href="grades.php?action=new&amp;asignatura=<?= (int) $subject['id'] ?>" class="chip"
+               style="--subject: <?= e(safe_color($subject['color'])) ?>"
+               aria-label="Añadir una nota de <?= e($subject['nombre']) ?>">
+              <span class="dot" aria-hidden="true"></span><?= e($subject['nombre']) ?>
+              <i class="ri-add-line" aria-hidden="true"></i>
+            </a>
           </li>
         <?php endforeach; ?>
       </ul>
-    </aside>
-
-    <section class="split__main" aria-labelledby="grades-title">
-      <h3 class="section__title" id="grades-title">
-        <i class="ri-award-line" aria-hidden="true"></i>
-        <?= $filtered !== null ? 'Notas de ' . e($filtered['nombre']) : 'Todas las notas' ?>
-        <span class="badge"><?= count($grades) ?></span>
-      </h3>
-
-      <?php if ($grades): ?>
-        <ul class="card card--flush grade-list">
-          <?php foreach ($grades as $grade): ?>
-            <?php $isPass = grade_passed($grade['nota']); ?>
-            <li class="grade-row">
-              <span class="grade-pill grade-pill--<?= $isPass ? 'pass' : 'fail' ?>">
-                <?= e(format_grade($grade['nota'])) ?>
-                <span class="sr-only"><?= $isPass ? '(aprobado)' : '(suspenso)' ?></span>
-              </span>
-              <div class="grade-row__body">
-                <span class="grade-mini__subject" style="--subject: <?= e(safe_color($grade['color'])) ?>">
-                  <span class="dot" aria-hidden="true"></span><?= e($grade['asignatura']) ?>
-                </span>
-                <span class="grade-mini__meta">
-                  <?= e(GRADE_TYPES[$grade['tipo']] ?? $grade['tipo']) ?> · <?= e(format_date($grade['fecha'])) ?>
-                </span>
-                <?php if ($grade['comentarios']): ?>
-                  <p class="grade-row__comment"><?= e(truncate($grade['comentarios'], 140)) ?></p>
-                <?php endif; ?>
-              </div>
-              <div class="grade-row__actions">
-                <a href="<?= e($editUrl($grade)) ?>" class="icon-btn icon-btn--sm"
-                   aria-label="Editar la nota de <?= e($grade['asignatura']) ?> del <?= e(format_date($grade['fecha'])) ?>" title="Editar">
-                  <i class="ri-pencil-line" aria-hidden="true"></i>
-                </a>
-                <?php partial('delete', [
-                    'action'   => 'grades.php',
-                    'id'       => (int) $grade['id'],
-                    'label'    => 'Eliminar la nota de ' . $grade['asignatura'] . ' del ' . format_date($grade['fecha']),
-                    'question' => '¿Eliminar la nota de ' . format_grade($grade['nota']) . ' en ' . $grade['asignatura'] . '?',
-                    'text'     => 'La media de la asignatura se recalculará. Esta acción no se puede deshacer.',
-                    'return'   => $return,
-                ]); ?>
-              </div>
-            </li>
-          <?php endforeach; ?>
-        </ul>
-      <?php else: ?>
-        <div class="card">
-          <?php partial('empty', [
-              'icon'        => 'ri-award-line',
-              'title'       => $subjectId > 0 ? 'Esta asignatura aún no tiene notas' : 'Aún no hay notas',
-              'text'        => 'Registra tus calificaciones para calcular tus medias.',
-              'actionHref'  => 'grades.php?action=new' . ($subjectId > 0 ? '&asignatura=' . $subjectId : ''),
-              'actionLabel' => 'Añadir nota',
-              'compact'     => true,
-          ]); ?>
-        </div>
-      <?php endif; ?>
     </section>
-  </div>
+  <?php endif; ?>
+
+  <?php if (!$groups && !$ungraded): ?>
+    <section class="card">
+      <?php partial('empty', [
+          'icon'        => 'ri-award-line',
+          'title'       => 'Aún no hay notas',
+          'text'        => 'Registra tus calificaciones para calcular tus medias.',
+          'actionHref'  => 'grades.php?action=new',
+          'actionLabel' => 'Añadir nota',
+      ]); ?>
+    </section>
+  <?php endif; ?>
 <?php endif; ?>

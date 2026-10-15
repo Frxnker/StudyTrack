@@ -115,6 +115,18 @@
     padding: 1rem 1.35rem;
   }
 
+  .grade-group__header {
+    padding: 1.2rem 1.35rem .6rem;
+  }
+
+  .grade-group__bar {
+    padding: 0 1.35rem 1rem;
+  }
+
+  .grade-group__footer {
+    padding: .8rem 1.35rem;
+  }
+
   .exam-row {
     flex-wrap: nowrap;
   }
@@ -352,8 +364,9 @@
     border-top: 0;
   }
 
-  /* Estadísticas y detalle de asignatura: dos columnas */
+  /* Estadísticas, detalle de asignatura y grupos de notas: dos columnas */
   .detail-grid,
+  .grade-groups,
   .chart-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
