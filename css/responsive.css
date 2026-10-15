@@ -187,97 +187,38 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  /* Calendario: los eventos pasan de puntos a etiquetas con texto */
+  /* Calendario: cuadrícula visible; la agenda pasa a mostrar solo el día seleccionado */
   .calendar-card {
-    padding: 1rem;
-  }
-
-  .calendar__cell {
-    height: 112px;
-    padding: 4px;
-    border-left: 1px solid var(--c-border);
-    text-align: left;
-  }
-
-  .calendar__cell:first-child {
-    border-left: 0;
-  }
-
-  .calendar__day {
-    width: 26px;
-    height: 26px;
-    font-size: .8rem;
-  }
-
-  .calendar__events {
-    flex-direction: column;
-    flex-wrap: nowrap;
-    gap: 2px;
-  }
-
-  .calendar__event {
-    display: flex;
-    align-items: center;
-    gap: .25rem;
-    width: auto;
-    height: auto;
-    overflow: hidden;
-    padding: 2px 6px;
-    border-radius: 6px;
-    background: var(--c-surface-3);
-    background: color-mix(in srgb, var(--subject, var(--c-text-3)) 14%, transparent);
-    color: var(--c-text);
-    color: color-mix(in srgb, var(--subject, var(--c-text-3)) 60%, var(--c-text));
-    font-size: .72rem;
-    font-weight: 600;
-    line-height: 1.4;
-    white-space: nowrap;
-  }
-
-  .calendar__event:hover {
-    text-decoration: none;
-    filter: brightness(.96);
-  }
-
-  /* Exámenes: franja de color y texto en negrita */
-  .calendar__event--exam {
-    border-radius: 6px;
-    box-shadow: inset 3px 0 0 var(--subject, var(--c-text-3));
-    font-weight: 800;
-  }
-
-  .calendar__event.is-done {
-    opacity: .55;
-  }
-
-  .calendar__event.is-done .calendar__event-text {
-    text-decoration: line-through;
-  }
-
-  .calendar__event i {
-    display: inline;
-    flex-shrink: 0;
-  }
-
-  .calendar__event-text {
     display: block;
-    overflow: hidden;
-    text-overflow: ellipsis;
   }
 
-  .calendar__more {
-    display: block;
-    padding: 0 6px;
-    font-size: .7rem;
-    font-weight: 600;
-  }
-
-  .calendar-legend i {
-    display: inline;
-  }
-
-  .calendar-legend__mark {
+  .agenda__title-month,
+  .agenda__date,
+  .agenda__month-empty {
     display: none;
+  }
+
+  .agenda__title-day {
+    display: inline;
+  }
+
+  .agenda__actions:not([hidden]) {
+    display: flex;
+    gap: .4rem;
+  }
+
+  .agenda__day {
+    display: none;
+  }
+
+  .agenda__day.is-selected {
+    display: block;
+  }
+
+  .agenda__day + .agenda__day {
+    margin-top: 0;
+    padding-top: 0;
+    border-top: 0;
   }
 
   .tabs {
@@ -342,26 +283,6 @@
 
   .content {
     padding: 1.75rem 2rem 3rem;
-  }
-
-  /* Agenda del calendario en dos columnas */
-  .agenda {
-    column-count: 2;
-    column-gap: 2.5rem;
-  }
-
-  .agenda .card__header {
-    column-span: all;
-  }
-
-  .agenda__day {
-    break-inside: avoid;
-  }
-
-  /* En columnas, el separador superior se sustituye por espacio */
-  .agenda__day + .agenda__day {
-    padding-top: 0;
-    border-top: 0;
   }
 
   /* Estadísticas, detalle de asignatura y grupos de notas: dos columnas */

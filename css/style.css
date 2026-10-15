@@ -3290,8 +3290,8 @@ a.grade-mini__subject:hover {
 }
 
 /* --- Calendario mensual ---
-   Móvil: cada evento es un punto de color (cuadrado si es examen).
-   Desde 768px los eventos muestran su texto (responsive.css). */
+   La cuadrícula solo se muestra desde 768px (responsive.css); en móvil se ve la
+   agenda del mes en lista. Cada evento es una etiqueta con el color de su asignatura. */
 .month-nav {
   flex-wrap: nowrap;
   align-items: center;
@@ -3305,7 +3305,8 @@ a.grade-mini__subject:hover {
 }
 
 .calendar-card {
-  padding: .75rem;
+  display: none;
+  padding: 1rem;
 }
 
 .calendar {
@@ -3328,26 +3329,42 @@ a.grade-mini__subject:hover {
 }
 
 .calendar__cell {
-  height: 56px;
-  padding: 3px 1px;
+  height: 112px;
+  padding: 4px;
   border-top: 1px solid var(--c-border);
-  text-align: center;
+  border-left: 1px solid var(--c-border);
   vertical-align: top;
+  cursor: pointer;
+  transition: background var(--dur) var(--ease);
+}
+
+.calendar__cell:first-child {
+  border-left: 0;
+}
+
+.calendar__cell:hover {
+  background: var(--c-surface-2);
+}
+
+/* Día seleccionado: su lista aparece en el panel de debajo */
+.calendar__cell.is-selected {
+  background: var(--c-primary-soft);
+  box-shadow: inset 0 0 0 2px var(--c-primary);
 }
 
 .calendar__day {
   display: inline-grid;
   place-items: center;
-  width: 30px;
-  height: 30px;
+  width: 26px;
+  height: 26px;
   border-radius: 50%;
   color: var(--c-text);
-  font-size: .85rem;
+  font-size: .8rem;
   font-weight: 600;
   font-variant-numeric: tabular-nums;
 }
 
-a.calendar__day:hover {
+.calendar__day:hover {
   background: var(--c-surface-3);
   text-decoration: none;
 }
@@ -3364,36 +3381,64 @@ a.calendar__day:hover {
 
 .calendar__events {
   display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 3px;
+  flex-direction: column;
+  gap: 2px;
   margin-top: 2px;
-}
-
-.calendar__event {
-  display: block;
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: var(--subject, var(--c-text-3));
-}
-
-.calendar__event--exam {
-  border-radius: 2px;
-}
-
-.calendar__event.is-done {
-  opacity: .4;
-}
-
-.calendar__event i,
-.calendar__event-text,
-.calendar__more {
-  display: none;
 }
 
 .calendar__cell.is-other .calendar__events {
   opacity: .5;
+}
+
+.calendar__event {
+  display: flex;
+  align-items: center;
+  gap: .25rem;
+  overflow: hidden;
+  padding: 2px 6px;
+  border-radius: 6px;
+  background: var(--c-surface-3);
+  background: color-mix(in srgb, var(--subject, var(--c-text-3)) 14%, transparent);
+  color: var(--c-text);
+  color: color-mix(in srgb, var(--subject, var(--c-text-3)) 60%, var(--c-text));
+  font-size: .72rem;
+  font-weight: 600;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+
+.calendar__event:hover {
+  text-decoration: none;
+  filter: brightness(.96);
+}
+
+/* Exámenes: franja de color y texto en negrita */
+.calendar__event--exam {
+  box-shadow: inset 3px 0 0 var(--subject, var(--c-text-3));
+  font-weight: 800;
+}
+
+.calendar__event.is-done {
+  opacity: .55;
+}
+
+.calendar__event.is-done .calendar__event-text {
+  text-decoration: line-through;
+}
+
+.calendar__event i {
+  flex-shrink: 0;
+}
+
+.calendar__event-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.calendar__more {
+  padding: 0 6px;
+  font-size: .7rem;
+  font-weight: 600;
 }
 
 .calendar-legend {
@@ -3412,40 +3457,31 @@ a.calendar__day:hover {
   gap: .4rem;
 }
 
-.calendar-legend__mark {
-  width: 9px;
-  height: 9px;
-  border-radius: 50%;
-  background: var(--c-text-3);
-}
-
-.calendar-legend__mark--exam {
-  border-radius: 2px;
-}
-
-/* Los iconos de la leyenda solo tienen sentido cuando los eventos muestran icono (≥768px) */
 .calendar-legend i {
-  display: none;
   color: var(--c-text-3);
 }
 
-/* --- Agenda del mes --- */
-.agenda__day {
-  scroll-margin-top: calc(var(--topbar-h) + 1rem);
+.calendar-legend__hint {
+  margin-left: auto;
+  color: var(--c-text-3);
 }
 
-.agenda__day:focus {
-  outline: none;
+/* --- Agenda: en móvil, todos los días del mes con algo; en escritorio, solo el
+   día seleccionado (responsive.css). Los elementos del modo escritorio se ocultan aquí. --- */
+.agenda__title-day,
+.agenda__actions,
+.agenda__day--empty {
+  display: none;
+}
+
+.agenda__day {
+  scroll-margin-top: calc(var(--topbar-h) + 1rem);
 }
 
 .agenda__day + .agenda__day {
   margin-top: .9rem;
   padding-top: .9rem;
   border-top: 1px solid var(--c-border);
-}
-
-.agenda__day:target .agenda__date {
-  color: var(--c-primary);
 }
 
 .agenda__date {
@@ -3466,6 +3502,13 @@ a.calendar__day:hover {
 
 .agenda__day.is-past {
   opacity: .7;
+}
+
+.agenda__empty-text {
+  padding: 1.25rem 0 .5rem;
+  color: var(--c-text-2);
+  font-size: .9rem;
+  text-align: center;
 }
 
 .task-mini.is-done .task-mini__title {

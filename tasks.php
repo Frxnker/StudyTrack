@@ -176,14 +176,14 @@ $action  = query('action');
 $filters = task_read_filters($_GET);
 
 if ($action === 'new') {
-    // Si venimos de una asignatura (tasks.php?action=new&asignatura=3) ya queda elegida
+    // Valores iniciales opcionales: ?asignatura=3 (desde una asignatura) y ?fecha=AAAA-MM-DD (desde el calendario)
     $subjectId = is_int($filters['asignatura'] ?? null) ? (string) $filters['asignatura'] : '';
     task_render_form($userId, [
         'id'            => 0,
         'titulo'        => '',
         'descripcion'   => '',
         'asignatura_id' => $subjectId,
-        'fecha_limite'  => '',
+        'fecha_limite'  => is_valid_date(query('fecha')) ? query('fecha') : '',
         'prioridad'     => 'media',
         'estado'        => 'pendiente',
     ], $filters);

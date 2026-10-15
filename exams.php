@@ -157,11 +157,12 @@ if ($subjectId > 0 && !subject_belongs_to($userId, $subjectId)) {
 }
 
 if ($action === 'new') {
+    // Valores iniciales opcionales: ?asignatura=3 y ?fecha=AAAA-MM-DD (desde el calendario)
     exam_render_form($userId, [
         'id'            => 0,
         'asignatura_id' => $subjectId > 0 ? (string) $subjectId : '',
         'nombre'        => '',
-        'fecha'         => '',
+        'fecha'         => is_valid_date(query('fecha')) ? query('fecha') : '',
         'hora'          => '',
         'aula'          => '',
         'descripcion'   => '',
