@@ -6,6 +6,7 @@
  * - Notificaciones (toasts)
  * - Mostrar/ocultar contraseña y medidor de seguridad
  * - Evitar envíos dobles de formularios
+ * - Confirmación antes de borrar y selector de color
  * - Sombra de la barra superior al hacer scroll
  * - Cuentas atrás de exámenes
  */
@@ -178,6 +179,99 @@ const App = (() => {
     });
   }
 
+  /* ---------- Confirmación antes de borrar ----------
+   * <form method="post" data-confirm="¿Eliminar «X»?" data-confirm-text="No se puede deshacer.">
+   * Se escucha en fase de captura para actuar antes que initFormLoading.
+   */
+  function confirmDialog(title, text) {
+    if (typeof HTMLDialogElement !== 'function') {
+      return Promise.resolve(window.confirm(text ? `${title}\n\n${text}` : title));
+    }
+
+    return new Promise((resolve) => {
+      const dialog = document.createElement('dialog');
+      dialog.className = 'modal';
+      dialog.setAttribute('aria-labelledby', 'modal-title');
+      dialog.setAttribute('aria-describedby', 'modal-text');
+      dialog.innerHTML = `
+        <form method="dialog" class="modal__box">
+          <div class="modal__icon"><i class="ri-delete-bin-6-line" aria-hidden="true"></i></div>
+          <h2 class="modal__title" id="modal-title"></h2>
+          <p class="modal__text" id="modal-text"></p>
+          <div class="modal__actions">
+            <button type="submit" value="cancel" class="btn btn--ghost">Cancelar</button>
+            <button type="submit" value="ok" class="btn btn--danger">
+              <i class="ri-delete-bin-6-line" aria-hidden="true"></i> Eliminar
+            </button>
+          </div>
+        </form>`;
+      // textContent: el título y el texto vienen de datos del usuario
+      $('.modal__title', dialog).textContent = title;
+      $('.modal__text', dialog).textContent = text;
+
+      // Clic fuera del cuadro (en el fondo) = cancelar
+      dialog.addEventListener('click', (event) => {
+        if (event.target === dialog) dialog.close('cancel');
+      });
+      dialog.addEventListener('close', () => {
+        resolve(dialog.returnValue === 'ok');
+        dialog.remove();
+      }, { once: true });
+
+      document.body.append(dialog);
+      dialog.showModal();
+      $('[value="cancel"]', dialog).focus(); // Opción segura por defecto
+    });
+  }
+
+  function initConfirm() {
+    document.addEventListener('submit', (event) => {
+      const form = event.target;
+      if (!(form instanceof HTMLFormElement) || !form.dataset.confirm) return;
+
+      // Segunda vuelta, ya confirmada: dejamos que el formulario se envíe
+      if (form.dataset.confirmed === '1') {
+        delete form.dataset.confirmed;
+        return;
+      }
+
+      event.preventDefault();
+      event.stopPropagation();
+      const opener = event.submitter || document.activeElement;
+
+      confirmDialog(form.dataset.confirm, form.dataset.confirmText || '').then((ok) => {
+        if (!ok) {
+          opener?.focus?.(); // Devolvemos el foco al botón que abrió el diálogo
+          return;
+        }
+        form.dataset.confirmed = '1';
+        if (typeof form.requestSubmit === 'function') {
+          form.requestSubmit();
+        } else {
+          form.submit();
+        }
+      });
+    }, true);
+  }
+
+  /* ---------- Selector de color (asignaturas) ----------
+   * El selector libre <input type="color" data-color-picker> actualiza el radio
+   * "personalizado" (data-color-custom), que es el que se envía con el formulario.
+   */
+  function initColorPickers() {
+    $$('[data-color-picker]').forEach((picker) => {
+      const radio = $('[data-color-custom]', picker.parentElement);
+      if (!radio) return;
+
+      const select = () => {
+        radio.value = picker.value.toUpperCase();
+        radio.checked = true;
+      };
+      picker.addEventListener('input', select);
+      picker.addEventListener('click', select);
+    });
+  }
+
   /* ---------- Barra superior ---------- */
   function initTopbar() {
     const topbar = $('.topbar');
@@ -236,6 +330,8 @@ const App = (() => {
   initPasswordToggles();
   initPasswordStrength();
   initFormLoading();
+  initConfirm();
+  initColorPickers();
   initTopbar();
   initCountdowns();
 

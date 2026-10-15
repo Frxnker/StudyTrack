@@ -18,7 +18,8 @@
    11. Autenticación (login / registro)
    12. Componentes de datos (chips, listas, estadísticas, gráficos)
    13. Dashboard
-   14. Animaciones
+   14. Asignaturas
+   15. Animaciones
    ========================================================================== */
 
 
@@ -731,6 +732,17 @@ button, input, select, textarea {
   font-size: 1.15rem;
 }
 
+.icon-btn--danger:hover {
+  background: var(--c-danger-soft);
+  color: var(--c-danger);
+}
+
+/* Formulario de una sola acción (borrar, completar…) dentro de una fila */
+.inline-form {
+  display: inline-flex;
+  margin: 0;
+}
+
 
 /* 6. Formularios
    ========================================================================== */
@@ -886,6 +898,73 @@ button, input, select, textarea {
   padding-right: 3.2rem;
 }
 
+/* Grupo de campos (radios, colores…) sin el marco del navegador */
+.fieldset {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.fieldset > legend {
+  margin-bottom: .4rem;
+  padding: 0;
+}
+
+/* Selector de color: círculos con radios ocultos + selector libre */
+.swatches {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .6rem;
+}
+
+.swatch {
+  position: relative;
+  display: inline-grid;
+  cursor: pointer;
+}
+
+.swatch__dot {
+  display: block;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--subject);
+  transition: transform var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
+}
+
+.swatch:hover .swatch__dot {
+  transform: scale(1.08);
+}
+
+.swatch input:checked + .swatch__dot {
+  box-shadow: 0 0 0 3px var(--c-surface), 0 0 0 5px var(--subject);
+}
+
+.swatch input:focus-visible + .swatch__dot {
+  outline: 2px solid var(--c-primary);
+  outline-offset: 6px;
+}
+
+.swatch__picker {
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 2px dashed var(--c-border-strong);
+  border-radius: 50%;
+  background: none;
+  cursor: pointer;
+}
+
+.swatch__picker::-webkit-color-swatch-wrapper { padding: 3px; }
+.swatch__picker::-webkit-color-swatch { border: 0; border-radius: 50%; }
+.swatch__picker::-moz-color-swatch { border: 0; border-radius: 50%; }
+
+.swatch--custom input:checked ~ .swatch__picker {
+  border-style: solid;
+  border-color: var(--c-text);
+}
+
 /* Medidor de seguridad de la contraseña */
 .strength {
   display: flex;
@@ -986,6 +1065,49 @@ button, input, select, textarea {
   margin-top: .2rem;
   color: var(--c-text-2);
   font-size: .95rem;
+}
+
+.page-header__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .5rem;
+}
+
+/* Enlace "← Volver" encima del título en los formularios */
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: .3rem;
+  margin-bottom: .35rem;
+  color: var(--c-text-2);
+  font-size: var(--fs-sm);
+  font-weight: 600;
+}
+
+.back-link:hover {
+  color: var(--c-primary);
+  text-decoration: none;
+}
+
+/* Tarjeta con un formulario: no se estira en pantallas anchas */
+.card--form {
+  max-width: 760px;
+}
+
+.card--form + .card--form {
+  margin-top: 1rem;
+}
+
+/* Bloque "Eliminar…" al final de los formularios de edición */
+.danger-zone {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  border-color: color-mix(in srgb, var(--c-danger) 25%, var(--c-border));
+}
+
+.danger-zone .card__title {
+  margin-bottom: .2rem;
 }
 
 /* Tarjeta destacada con degradado (saludo del dashboard) */
@@ -1118,6 +1240,64 @@ button, input, select, textarea {
 
 .toast.is-leaving {
   animation: toast-out .25s var(--ease) forwards;
+}
+
+/* Diálogo de confirmación (<dialog> creado desde app.js) */
+.modal {
+  width: min(calc(100% - 2rem), 420px);
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-lg);
+  background: var(--c-surface);
+  color: var(--c-text);
+  box-shadow: var(--shadow-lg);
+}
+
+.modal[open] {
+  animation: modal-in .25s var(--ease-out) both;
+}
+
+.modal::backdrop {
+  background: rgb(15 23 42 / .5);
+}
+
+.modal__box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: .4rem;
+  margin: 0;
+  padding: 1.5rem;
+  text-align: center;
+}
+
+.modal__icon {
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  margin-bottom: .5rem;
+  border-radius: 18px;
+  background: var(--c-danger-soft);
+  color: var(--c-danger);
+  font-size: 1.6rem;
+}
+
+.modal__title {
+  font-size: 1.1rem;
+}
+
+.modal__text {
+  color: var(--c-text-2);
+  font-size: .9rem;
+}
+
+.modal__actions {
+  display: flex;
+  flex-direction: column-reverse;
+  gap: .5rem;
+  width: 100%;
+  margin-top: 1rem;
 }
 
 
@@ -1966,7 +2146,138 @@ a.stat:hover {
 }
 
 
-/* 14. Animaciones
+/* 14. Asignaturas
+   ========================================================================== */
+.subject-grid--cards {
+  gap: 1rem;
+}
+
+.subject-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: .9rem;
+  overflow: hidden;
+}
+
+/* Franja superior con el color de la asignatura */
+.subject-card::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 4px;
+  background: var(--subject);
+}
+
+.subject-card__header {
+  display: flex;
+  align-items: flex-start;
+  gap: .85rem;
+}
+
+.subject-card__icon {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius);
+  background: var(--c-surface-3);
+  background: color-mix(in srgb, var(--subject) 15%, transparent);
+  color: var(--subject);
+  color: color-mix(in srgb, var(--subject) 70%, var(--c-text));
+  font-size: .9rem;
+  font-weight: 800;
+}
+
+.subject-card__heading {
+  flex: 1;
+  min-width: 0;
+}
+
+.subject-card__name {
+  font-size: 1.05rem;
+  overflow-wrap: anywhere;
+}
+
+.subject-card__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .15rem .85rem;
+  margin-top: .2rem;
+  color: var(--c-text-2);
+  font-size: .8rem;
+}
+
+.subject-card__meta span {
+  display: inline-flex;
+  align-items: center;
+  gap: .3rem;
+}
+
+.subject-card__actions {
+  display: flex;
+  flex-shrink: 0;
+  gap: .1rem;
+  margin: -.35rem -.4rem 0 0;
+}
+
+.subject-card__desc {
+  color: var(--c-text-2);
+  font-size: .875rem;
+}
+
+.subject-card__stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: .5rem;
+  margin: 0;
+}
+
+.subject-card__stat {
+  display: flex;
+  flex-direction: column-reverse; /* valor encima de la etiqueta */
+  padding: .6rem .4rem;
+  border-radius: var(--radius);
+  background: var(--c-surface-2);
+  text-align: center;
+}
+
+.subject-card__stat dt {
+  color: var(--c-text-2);
+  font-size: .7rem;
+  font-weight: 600;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+
+.subject-card__stat dd {
+  margin: 0;
+  font-size: 1.3rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.subject-card__footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: .6rem;
+  margin-top: auto;
+  padding-top: .85rem;
+  border-top: 1px solid var(--c-border);
+}
+
+.subject-card__links {
+  display: flex;
+  gap: .9rem;
+  font-size: var(--fs-sm);
+  font-weight: 600;
+}
+
+
+/* 15. Animaciones
    ========================================================================== */
 @keyframes page-in {
   from { opacity: 0; transform: translateY(8px); }
@@ -1985,6 +2296,11 @@ a.stat:hover {
 
 @keyframes toast-in {
   from { opacity: 0; transform: translateY(-14px) scale(.98); }
+  to   { opacity: 1; transform: none; }
+}
+
+@keyframes modal-in {
+  from { opacity: 0; transform: translateY(10px) scale(.97); }
   to   { opacity: 1; transform: none; }
 }
 

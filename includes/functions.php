@@ -331,11 +331,30 @@ function str_take(string $value, int $length): string
 }
 
 /**
+ * Texto vacío → NULL (para guardar en la base de datos los campos opcionales).
+ */
+function nullable(string $value): ?string
+{
+    return $value === '' ? null : $value;
+}
+
+/**
  * Recorta un texto largo añadiendo "…".
  */
 function truncate(string $value, int $length = 80): string
 {
     return str_length($value) > $length ? rtrim(str_take($value, $length - 1)) . '…' : $value;
+}
+
+/**
+ * Enumeración en español: ['a', 'b', 'c'] → "a, b y c".
+ */
+function human_list(array $items): string
+{
+    $items = array_values(array_filter($items, static fn ($item): bool => $item !== '' && $item !== null));
+    $last  = array_pop($items);
+
+    return $items ? implode(', ', $items) . ' y ' . $last : (string) $last;
 }
 
 /**
