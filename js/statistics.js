@@ -11,6 +11,7 @@
  *
  * Los colores generales y la tipografía vienen del CSS (clases .chart__*), así que
  * los gráficos respetan el tema claro/oscuro. Al cambiar el ancho se redibujan.
+ * Al pasar el ratón (o tocar en el móvil) cada barra o punto muestra un tooltip.
  */
 'use strict';
 
@@ -40,9 +41,10 @@
     return node;
   }
 
-  /** Tooltip nativo del navegador (<title> dentro del elemento). */
+  /** Texto del tooltip de un elemento del gráfico (lo muestra initTooltip). */
   function tooltip(node, content) {
-    el('title', {}, node).textContent = content;
+    node.dataset.tip = content;
+    node.classList.add('has-tip');
   }
 
   /** Número con formato español: 7.5 → "7,5". */
@@ -258,6 +260,64 @@
     text(svg, center, center + 24, total === 1 ? 'tarea' : 'tareas', { 'text-anchor': 'middle', class: 'chart__donut-label' });
   }
 
+  /* ---------- Tooltip ----------
+   * Un único <div> que sigue al puntero sobre los elementos con data-tip.
+   * Con ratón aparece al pasar por encima; en pantallas táctiles, al tocar
+   * (y se oculta al tocar fuera). Los lectores de pantalla usan las tablas
+   * "Ver datos", por eso el tooltip va con aria-hidden.
+   */
+  function initTooltip() {
+    const tip = document.createElement('div');
+    tip.className = 'chart-tooltip';
+    tip.setAttribute('aria-hidden', 'true');
+    document.body.append(tip);
+
+    let current = null;
+
+    const place = (x, y) => {
+      const margin = 8;
+      const { width, height } = tip.getBoundingClientRect();
+      const left = Math.min(Math.max(x, width / 2 + margin), window.innerWidth - width / 2 - margin);
+      const above = y - height - 14 > margin; // si no cabe encima, debajo del puntero
+      tip.style.left = `${left}px`;
+      tip.style.top = `${above ? y - 14 : y + 18}px`;
+      tip.classList.toggle('is-below', !above);
+    };
+
+    const show = (target, x, y) => {
+      if (current) current.classList.remove('is-active');
+      current = target;
+      current.classList.add('is-active');
+      tip.textContent = target.dataset.tip; // textContent: nunca HTML
+      tip.classList.add('is-visible');
+      place(x, y);
+    };
+
+    const hide = () => {
+      if (current) current.classList.remove('is-active');
+      current = null;
+      tip.classList.remove('is-visible');
+    };
+
+    document.addEventListener('pointerover', (event) => {
+      const target = event.target.closest?.('.has-tip');
+      if (target && event.pointerType !== 'touch') show(target, event.clientX, event.clientY);
+    });
+    document.addEventListener('pointermove', (event) => {
+      if (current && event.pointerType !== 'touch') place(event.clientX, event.clientY);
+    });
+    document.addEventListener('pointerout', (event) => {
+      if (current && event.pointerType !== 'touch' && !current.contains(event.relatedTarget)) hide();
+    });
+    document.addEventListener('pointerdown', (event) => {
+      if (event.pointerType !== 'touch') return;
+      const target = event.target.closest?.('.has-tip');
+      if (target) show(target, event.clientX, event.clientY);
+      else hide();
+    });
+    window.addEventListener('scroll', hide, { passive: true });
+  }
+
   /* ---------- Dibujo y redibujo ---------- */
   const DRAW = {
     subjects: drawSubjects,
@@ -279,6 +339,7 @@
   }
 
   containers.forEach((container) => render(container, true));
+  initTooltip();
 
   // Redibuja al cambiar el ancho (girar el móvil, redimensionar la ventana…)
   if ('ResizeObserver' in window) {

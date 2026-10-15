@@ -3760,11 +3760,44 @@ a.grade-mini__subject:hover {
   fill: var(--c-surface-3);
 }
 
-.chart__bar:hover,
-.chart__col:hover,
-.chart__point:hover,
-.chart__slice:hover {
+.chart .has-tip {
+  cursor: pointer;
+}
+
+.chart .has-tip.is-active {
   opacity: .8;
+}
+
+.chart__point.is-active {
+  stroke-width: 4;
+}
+
+/* Tooltip de los gráficos (colores invertidos respecto al tema) */
+.chart-tooltip {
+  position: fixed;
+  z-index: 120;
+  max-width: 260px;
+  padding: .45rem .7rem;
+  border-radius: var(--radius-sm);
+  background: var(--c-text);
+  color: var(--c-surface);
+  box-shadow: var(--shadow-md);
+  font-size: .78rem;
+  font-weight: 600;
+  line-height: 1.35;
+  text-align: center;
+  pointer-events: none;
+  opacity: 0;
+  transform: translate(-50%, -100%);
+  transition: opacity .12s var(--ease);
+}
+
+.chart-tooltip.is-below {
+  transform: translate(-50%, 0);
+}
+
+.chart-tooltip.is-visible {
+  opacity: 1;
 }
 
 .chart__line {

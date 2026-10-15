@@ -140,22 +140,33 @@ $json = json_encode($chartData, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JS
       <h3 class="card__title" id="chart-weeks-title"><i class="ri-bar-chart-2-line" aria-hidden="true"></i> Tareas completadas por semana</h3>
       <span class="text-soft text-xs fw-600">Últimas 8 semanas</span>
     </header>
-    <div class="chart" data-chart="weeks"
-         data-label="Gráfico de columnas con las tareas completadas en cada una de las últimas 8 semanas"></div>
-    <details class="chart__data">
-      <summary>Ver datos</summary>
-      <table class="data-table">
-        <thead><tr><th scope="col">Semana</th><th scope="col">Completadas</th></tr></thead>
-        <tbody>
-          <?php foreach ($chartData['weeks'] as $row): ?>
-            <tr>
-              <th scope="row"><?= e($row['range']) ?><?= $row['current'] ? ' (esta semana)' : '' ?></th>
-              <td><?= $row['count'] ?></td>
-            </tr>
-          <?php endforeach; ?>
-        </tbody>
-      </table>
-    </details>
+    <?php if ($weeksTotal > 0): ?>
+      <div class="chart" data-chart="weeks"
+           data-label="Gráfico de columnas con las tareas completadas en cada una de las últimas 8 semanas"></div>
+      <details class="chart__data">
+        <summary>Ver datos</summary>
+        <table class="data-table">
+          <thead><tr><th scope="col">Semana</th><th scope="col">Completadas</th></tr></thead>
+          <tbody>
+            <?php foreach ($chartData['weeks'] as $row): ?>
+              <tr>
+                <th scope="row"><?= e($row['range']) ?><?= $row['current'] ? ' (esta semana)' : '' ?></th>
+                <td><?= $row['count'] ?></td>
+              </tr>
+            <?php endforeach; ?>
+          </tbody>
+        </table>
+      </details>
+    <?php else: ?>
+      <?php partial('empty', [
+          'icon'        => 'ri-bar-chart-2-line',
+          'title'       => 'Sin tareas completadas',
+          'text'        => 'Cuando completes tareas verás aquí tu ritmo de cada semana.',
+          'actionHref'  => 'tasks.php',
+          'actionLabel' => 'Ir a mis tareas',
+          'compact'     => true,
+      ]); ?>
+    <?php endif; ?>
   </section>
 
   <!-- 4. Distribución de tareas por estado -->
