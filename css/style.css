@@ -20,7 +20,8 @@
    13. Dashboard
    14. Asignaturas
    15. Tareas
-   16. Animaciones
+   16. Exámenes
+   17. Animaciones
    ========================================================================== */
 
 
@@ -899,6 +900,20 @@ button, input, select, textarea {
   padding-right: 3.2rem;
 }
 
+/* Desplegable más bajo para filtros en la cabecera de página */
+.select--sm {
+  min-height: 42px;
+  padding-top: .45rem;
+  padding-bottom: .45rem;
+  border-radius: 10px;
+}
+
+.inline-filter {
+  display: flex;
+  flex: 1 1 220px;
+  gap: .5rem;
+}
+
 /* Grupo de campos (radios, colores…) sin el marco del navegador */
 .fieldset {
   min-width: 0;
@@ -1151,6 +1166,23 @@ button, input, select, textarea {
 .back-link:hover {
   color: var(--c-primary);
   text-decoration: none;
+}
+
+/* Bloque de una página con su propio título ("Próximos", "Pasados"…) */
+.section + .section {
+  margin-top: 1.75rem;
+}
+
+.section__title {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  margin-bottom: .85rem;
+  font-size: 1.05rem;
+}
+
+.section__title > i {
+  color: var(--c-primary);
 }
 
 /* Tarjeta sin relleno para listas que ocupan todo el ancho */
@@ -1805,6 +1837,35 @@ button, input, select, textarea {
 
 .filters__actions .btn {
   flex: 1;
+}
+
+/* --- Fecha en bloque (día grande + mes) con el color de la asignatura --- */
+.date-badge {
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 52px;
+  border-radius: var(--radius);
+  background: var(--c-primary-soft);
+  background: color-mix(in srgb, var(--subject, var(--c-primary)) 12%, var(--c-surface));
+  color: var(--c-primary);
+  color: color-mix(in srgb, var(--subject, var(--c-primary)) 70%, var(--c-text));
+  line-height: 1.1;
+}
+
+.date-badge__day {
+  font-size: 1.2rem;
+  font-weight: 800;
+}
+
+.date-badge__month {
+  font-size: .68rem;
+  font-weight: 700;
+  letter-spacing: .04em;
+  text-transform: uppercase;
 }
 
 /* --- Lista de detalles con icono (fecha, hora, aula…) --- */
@@ -2593,7 +2654,98 @@ a.stat:hover {
 }
 
 
-/* 16. Animaciones
+/* 16. Exámenes
+   ========================================================================== */
+.exam-grid {
+  display: grid;
+  gap: 1rem;
+}
+
+/* Franja izquierda con el color de la asignatura (sombra interior: respeta el borde redondeado) */
+.exam-card {
+  display: flex;
+  flex-direction: column;
+  gap: .6rem;
+  box-shadow: inset 4px 0 0 var(--subject), var(--shadow-xs);
+}
+
+.exam-card--next {
+  border-color: color-mix(in srgb, var(--subject) 45%, var(--c-border));
+  box-shadow: inset 4px 0 0 var(--subject), var(--shadow-md);
+}
+
+.exam-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: .5rem;
+}
+
+.exam-card__actions {
+  display: flex;
+  flex-shrink: 0;
+  gap: .1rem;
+  margin-right: -.4rem;
+}
+
+.exam-card__name {
+  font-size: 1.1rem;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+}
+
+.exam-card__desc {
+  color: var(--c-text-2);
+  font-size: .875rem;
+}
+
+.exam-card__countdown {
+  margin-top: auto;
+}
+
+.exam-list > li + li {
+  border-top: 1px solid var(--c-border);
+}
+
+/* En móvil las acciones bajan a una segunda línea, alineadas con el texto */
+.exam-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: .5rem .85rem;
+  padding: .85rem 1rem;
+}
+
+.exam-row__body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: .3rem;
+  min-width: 0;
+}
+
+.exam-row__name {
+  color: var(--c-text);
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.exam-row__name:hover {
+  color: var(--c-primary);
+  text-decoration: none;
+}
+
+.exam-row__actions {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: .1rem;
+  width: 100%;
+  padding-left: calc(48px + .85rem); /* ancho de .date-badge + hueco */
+}
+
+
+/* 17. Animaciones
    ========================================================================== */
 @keyframes page-in {
   from { opacity: 0; transform: translateY(8px); }

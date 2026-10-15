@@ -94,9 +94,29 @@
     flex: none;
   }
 
-  .task {
+  .task,
+  .exam-row {
     gap: 1rem;
     padding: 1rem 1.35rem;
+  }
+
+  .exam-row {
+    flex-wrap: nowrap;
+  }
+
+  .exam-row__actions {
+    width: auto;
+    padding-left: 0;
+  }
+
+  .page-header__actions {
+    flex-wrap: nowrap;
+    align-items: center;
+  }
+
+  .inline-filter {
+    flex: none;
+    width: 240px;
   }
 }
 
@@ -133,6 +153,10 @@
 
   .dash-week {
     order: 3; /* junto al próximo examen */
+  }
+
+  .exam-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .tabs {
