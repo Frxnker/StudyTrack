@@ -48,7 +48,7 @@ que funciona igual de bien en el móvil que en el ordenador.
 
 - **PHP 8.0 o superior** (probado con PHP 8.2) con las extensiones `pdo_mysql` y, recomendada, `mbstring`.
 - **MySQL 8** o **MariaDB 10.4** o superior.
-- Un servidor web: **XAMPP**, **Laragon** o Docker (ver más abajo).
+- Un servidor web: **XAMPP**, **Laragon** o **Docker** (ver más abajo).
 
 ## Instalación
 
@@ -68,6 +68,26 @@ que funciona igual de bien en el móvil que en el ordenador.
    y phpMyAdmin (menú *Base de datos*).
 4. Entra en <http://studytrack.test> (si tienes activados los *virtual hosts* automáticos)
    o en <http://localhost/StudyTrack>.
+
+### Con Docker
+
+Solo necesitas [Docker Desktop](https://www.docker.com/products/docker-desktop/) (o Docker Engine con Compose).
+`docker-compose.yml` arranca dos contenedores: la app (PHP 8.3 + Apache) y MySQL 8.4.
+
+```bash
+cp .env.example .env      # opcional: cambia las contraseñas y el puerto
+docker compose up -d --build
+```
+
+Abre <http://localhost:8080> y entra con el [usuario de prueba](#usuario-de-prueba).
+
+- La primera vez, MySQL importa automáticamente `sql/database.sql` y `sql/demo_data.sql`.
+  Si no quieres los datos de ejemplo, comenta esa línea en `docker-compose.yml` antes de arrancar.
+- Los datos se guardan en el volumen `db-data`. Para empezar de cero (y volver a importar el SQL):
+  `docker compose down -v`.
+- Errores de PHP: `docker compose logs -f app`.
+- Si lo publicas detrás de un proxy inverso con HTTPS (Nginx, Traefik, Caddy…), pon
+  `TRUST_PROXY=true` en `.env` para que la cookie de sesión se marque como `Secure`.
 
 ### Base de datos
 
@@ -106,8 +126,18 @@ También se pueden usar variables de entorno:
 | `DB_HOST`, `DB_PORT` | `127.0.0.1`, `3306` | Servidor de MySQL |
 | `DB_NAME` | `studytrack` | Base de datos |
 | `DB_USER`, `DB_PASS` | `root`, *(vacía)* | Credenciales |
+| `APP_DEBUG` | `false` | `true` muestra los detalles de los errores. Solo para desarrollo. |
+| `TRUST_PROXY` | `false` | `true` si hay un proxy inverso con HTTPS delante (usa `X-Forwarded-Proto`). |
+
+Para activar la depuración en XAMPP o Laragon, añade `SetEnv APP_DEBUG true` al final de
+`httpd.conf` (en XAMPP, *Config → Apache (httpd.conf)*) y reinicia Apache.
+
+La cookie de sesión se marca como `Secure` automáticamente cuando la web se sirve por HTTPS.
 
 El resto de ajustes (nombre, zona horaria, nota de aprobado…) están en `config/app.php`.
+
+El archivo `.htaccess` impide el acceso directo a las carpetas internas
+(`config/`, `includes/`, `models/`, `views/`, `sql/`…) y el listado de directorios.
 
 ## Usuario de prueba
 
@@ -158,5 +188,9 @@ StudyTrack/
 │   ├── database.sql      Esquema de la base de datos
 │   └── demo_data.sql     Datos de ejemplo
 ├── assets/img/           Favicon
-└── docs/capturas/        Imágenes de este README
+├── docs/capturas/        Imágenes de este README
+├── .htaccess             Bloquea el acceso a las carpetas internas
+├── Dockerfile            Imagen PHP 8.3 + Apache
+├── docker-compose.yml    App + MySQL con importación automática del SQL
+└── .env.example          Variables para Docker (copiar como .env)
 ```

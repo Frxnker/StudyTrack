@@ -1,0 +1,55 @@
+# StudyTrack · aplicación (PHP + Apache) y base de datos (MySQL) con Docker
+#
+#   docker compose up -d --build   → arranca todo en http://localhost:8080
+#   docker compose logs -f app     → ver los errores de PHP
+#   docker compose down            → para los contenedores (los datos se conservan)
+#   docker compose down -v         → para los contenedores y BORRA la base de datos
+#
+# La primera vez que arranca (volumen vacío), MySQL ejecuta los .sql montados en
+# /docker-entrypoint-initdb.d: crea el esquema y carga los datos de ejemplo.
+# Si no quieres los datos de ejemplo, comenta la línea de demo_data.sql.
+#
+# Las contraseñas y opciones se pueden cambiar en un archivo .env (ver .env.example).
+
+services:
+  app:
+    build: .
+    ports:
+      - "${APP_PORT:-8080}:80"
+    environment:
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_NAME: studytrack
+      DB_USER: studytrack
+      DB_PASS: ${DB_PASS:-studytrack}
+      APP_DEBUG: ${APP_DEBUG:-false}
+      TRUST_PROXY: ${TRUST_PROXY:-false}
+    depends_on:
+      db:
+        condition: service_healthy   # espera a que MySQL haya terminado de importar el SQL
+    restart: unless-stopped
+
+  db:
+    image: mysql:8.4
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    environment:
+      MYSQL_DATABASE: studytrack
+      MYSQL_USER: studytrack
+      MYSQL_PASSWORD: ${DB_PASS:-studytrack}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASS:-root-studytrack}
+      TZ: Europe/Madrid              # misma zona horaria que la app (CURDATE() de demo_data.sql)
+    volumes:
+      - db-data:/var/lib/mysql
+      - ./sql/database.sql:/docker-entrypoint-initdb.d/01-database.sql:ro
+      - ./sql/demo_data.sql:/docker-entrypoint-initdb.d/02-demo_data.sql:ro
+    healthcheck:
+      # Solo responde por TCP cuando ha terminado la importación inicial
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -u root -p\"$$MYSQL_ROOT_PASSWORD\" --silent"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 30s
+    restart: unless-stopped
+
+volumes:
+  db-data:

@@ -1,0 +1,13 @@
+# Archivos que no se copian a la imagen de Docker
+.git
+.gitignore
+.dockerignore
+.env
+.env.example
+Dockerfile
+docker-compose.yml
+README.md
+docs/
+sql/
+config/database.local.php
+*.log

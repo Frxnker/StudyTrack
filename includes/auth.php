@@ -31,7 +31,7 @@ function start_secure_session(): void
         return;
     }
 
-    $isHttps = !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off';
+    $isHttps = request_is_https();
 
     ini_set('session.use_strict_mode', '1');   // Rechaza ids de sesión inventados
     ini_set('session.use_only_cookies', '1');  // Nunca el id en la URL
@@ -62,6 +62,22 @@ function start_secure_session(): void
     }
 
     $_SESSION['last_activity'] = time();
+}
+
+/**
+ * ¿La petición llegó por HTTPS? Decide si la cookie de sesión lleva el flag Secure.
+ * Detrás de un proxy inverso que termina el HTTPS, PHP recibe HTTP: en ese caso
+ * se mira X-Forwarded-Proto, pero solo si TRUST_PROXY está activado (si no,
+ * cualquiera podría falsear la cabecera).
+ */
+function request_is_https(): bool
+{
+    if (!empty($_SERVER['HTTPS']) && strtolower((string) $_SERVER['HTTPS']) !== 'off') {
+        return true;
+    }
+
+    return TRUST_PROXY
+        && strtolower((string) ($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '')) === 'https';
 }
 
 /**

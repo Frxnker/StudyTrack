@@ -13,3 +13,6 @@ desktop.ini
 # Editores
 .idea/
 *.swp
+
+# Variables de Docker (ver .env.example)
+.env
