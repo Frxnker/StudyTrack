@@ -3,6 +3,7 @@
  * Asignaturas: CRUD completo.
  *
  *   GET  subjects.php                    → listado en tarjetas
+ *   GET  subjects.php?action=show&id=N   → detalle: tareas, exámenes, notas y horario
  *   GET  subjects.php?action=new         → formulario de alta
  *   GET  subjects.php?action=edit&id=N   → formulario de edición
  *   POST subjects.php  action=create|update|delete
@@ -13,6 +14,9 @@ declare(strict_types=1);
 require __DIR__ . '/includes/bootstrap.php';
 require_once BASE_PATH . '/models/subject.php';
 require_once BASE_PATH . '/models/grade.php';
+require_once BASE_PATH . '/models/task.php';
+require_once BASE_PATH . '/models/exam.php';
+require_once BASE_PATH . '/models/schedule.php';
 
 require_login();
 
@@ -54,6 +58,24 @@ function subject_validate(int $userId, array $data, int $exceptId = 0): array
     }
 
     return $errors;
+}
+
+/**
+ * Texto del diálogo de borrado: qué se perderá al eliminar la asignatura.
+ * "Se borrarán también 1 examen, 3 notas y 3 clases del horario. Sus tareas se conservarán…"
+ */
+function subject_delete_warning(int $userId, int $id): string
+{
+    $related = subject_related_counts($userId, $id);
+    $lost = human_list([
+        $related['examenes'] ? plural($related['examenes'], 'examen', 'exámenes') : '',
+        $related['notas'] ? plural($related['notas'], 'nota', 'notas') : '',
+        $related['clases'] ? plural($related['clases'], 'clase del horario', 'clases del horario') : '',
+    ]);
+
+    return trim(($lost !== '' ? 'Se borrarán también ' . $lost . '. ' : '')
+        . ($related['tareas'] ? 'Sus tareas se conservarán sin asignatura. ' : '')
+        . 'Esta acción no se puede deshacer.');
 }
 
 /**
@@ -150,18 +172,48 @@ if ($action === 'edit') {
     exit;
 }
 
+if ($action === 'show') {
+    $subject = subject_find($userId, request_id());
+    if ($subject === null) {
+        abort(404);
+    }
+    $id = (int) $subject['id'];
+
+    $tasks    = task_list($userId, ['asignatura' => $id]);
+    $grades   = grade_list($userId, $id);
+    $classes  = array_values(array_filter(
+        schedule_all($userId),
+        static fn (array $class): bool => (int) $class['asignatura_id'] === $id
+    ));
+    $upcoming = exam_upcoming($userId, $id);
+
+    render('subjects/show', [
+        'pageTitle'     => $subject['nombre'],
+        'subject'       => $subject,
+        'pendingTasks'  => array_values(array_filter($tasks, static fn (array $t): bool => $t['estado'] !== 'completada')),
+        'doneCount'     => count(array_filter($tasks, static fn (array $t): bool => $t['estado'] === 'completada')),
+        'upcoming'      => $upcoming,
+        'countdown'     => $upcoming ? countdown_parts($upcoming[0]['fecha'], $upcoming[0]['hora']) : null,
+        'past'          => exam_past($userId, $id),
+        'grades'        => $grades,
+        'average'       => $grades ? array_sum(array_column($grades, 'nota')) / count($grades) : null,
+        'classes'       => $classes,
+        'weeklyMinutes' => array_sum(array_map(
+            static fn (array $c): int => time_to_minutes($c['hora_fin']) - time_to_minutes($c['hora_inicio']),
+            $classes
+        )),
+        'deleteWarning' => subject_delete_warning($userId, $id),
+        'today'         => today(),
+        'fab'           => ['href' => 'tasks.php?action=new&asignatura=' . $id, 'label' => 'Nueva tarea de esta asignatura'],
+    ]);
+    exit;
+}
+
 $subjects = subject_all_with_stats($userId);
 
 // Avisos para el diálogo de borrado: qué se perderá con cada asignatura
 foreach ($subjects as &$subject) {
-    $related = subject_related_counts($userId, (int) $subject['id']);
-    $lost = human_list([
-        $related['examenes'] ? plural($related['examenes'], 'examen', 'exámenes') : '',
-        $related['notas'] ? plural($related['notas'], 'nota', 'notas') : '',
-        $related['clases'] ? plural($related['clases'], 'clase del horario', 'clases del horario') : '',
-    ]);
-    $subject['aviso_borrado'] = ($lost !== '' ? 'Se borrarán también ' . $lost . '. ' : '')
-        . ($related['tareas'] ? 'Sus tareas se conservarán sin asignatura.' : '');
+    $subject['aviso_borrado'] = subject_delete_warning($userId, (int) $subject['id']);
 }
 unset($subject);
 

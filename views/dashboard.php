@@ -148,7 +148,7 @@ $passedPct    = $gradedCount > 0 ? (int) round($passedCount / $gradedCount * 100
       <?php if ($subjects): ?>
         <div class="subject-grid">
           <?php foreach ($subjects as $subject): ?>
-            <a href="subjects.php" class="subject-tile" style="--subject: <?= e(safe_color($subject['color'])) ?>">
+            <a href="subjects.php?action=show&amp;id=<?= (int) $subject['id'] ?>" class="subject-tile" style="--subject: <?= e(safe_color($subject['color'])) ?>">
               <span class="subject-tile__name"><?= e($subject['nombre']) ?></span>
               <?php if ($subject['profesor']): ?>
                 <span class="subject-tile__teacher">

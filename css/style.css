@@ -2636,11 +2636,86 @@ a.stat:hover {
   border-top: 1px solid var(--c-border);
 }
 
-.subject-card__links {
+/* El nombre de la tarjeta enlaza al detalle de la asignatura */
+.subject-card__name a {
+  color: inherit;
+}
+
+.subject-card__name a:hover {
+  color: var(--c-primary);
+  text-decoration: none;
+}
+
+/* --- Detalle de una asignatura --- */
+.subject-title {
   display: flex;
-  gap: .9rem;
-  font-size: var(--fs-sm);
+  align-items: center;
+  gap: .6rem;
+  overflow-wrap: anywhere;
+}
+
+.subject-title__mark {
+  flex-shrink: 0;
+  width: 14px;
+  height: 14px;
+  border-radius: 5px;
+  background: var(--subject);
+}
+
+.subject-desc {
+  max-width: 70ch;
+  margin-bottom: 1rem;
+  color: var(--c-text-2);
+}
+
+.quick-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .5rem;
+  margin-bottom: 1rem;
+}
+
+.detail-grid {
+  display: grid;
+  gap: 1rem;
+  align-items: start;
+}
+
+.detail-grid .card__footer-link {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: .75rem;
+  padding-top: .75rem;
+  border-top: 1px solid var(--c-border);
+}
+
+a.grade-mini__subject {
+  color: var(--c-text);
+}
+
+a.grade-mini__subject:hover {
+  color: var(--c-primary);
+  text-decoration: none;
+}
+
+.class-mini {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  padding: .65rem 0;
+}
+
+.class-mini__day {
+  width: 5.5rem;
+  flex-shrink: 0;
   font-weight: 600;
+}
+
+.class-mini__time {
+  flex: 1;
+  color: var(--c-text-2);
+  font-size: .875rem;
+  font-variant-numeric: tabular-nums;
 }
 
 

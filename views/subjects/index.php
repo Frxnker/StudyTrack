@@ -50,7 +50,9 @@ $totalPending = array_sum(array_column($subjects, 'tareas_pendientes'));
         <header class="subject-card__header">
           <span class="subject-card__icon" aria-hidden="true"><?= e(initials($subject['nombre'])) ?></span>
           <div class="subject-card__heading">
-            <h3 class="subject-card__name" id="subject-<?= (int) $subject['id'] ?>"><?= e($subject['nombre']) ?></h3>
+            <h3 class="subject-card__name" id="subject-<?= (int) $subject['id'] ?>">
+              <a href="subjects.php?action=show&amp;id=<?= (int) $subject['id'] ?>"><?= e($subject['nombre']) ?></a>
+            </h3>
             <?php if ($subject['profesor'] || $subject['curso']): ?>
               <p class="subject-card__meta">
                 <?php if ($subject['profesor']): ?>
@@ -72,7 +74,7 @@ $totalPending = array_sum(array_column($subjects, 'tareas_pendientes'));
                 'id'       => (int) $subject['id'],
                 'label'    => 'Eliminar ' . $subject['nombre'],
                 'question' => '¿Eliminar la asignatura «' . $subject['nombre'] . '»?',
-                'text'     => trim($subject['aviso_borrado'] . ' Esta acción no se puede deshacer.'),
+                'text'     => $subject['aviso_borrado'],
             ]); ?>
           </div>
         </header>
@@ -113,11 +115,10 @@ $totalPending = array_sum(array_column($subjects, 'tareas_pendientes'));
           <?php else: ?>
             <span class="badge"><i class="ri-calendar-check-line" aria-hidden="true"></i> Sin exámenes próximos</span>
           <?php endif; ?>
-          <span class="subject-card__links">
-            <a href="tasks.php?asignatura=<?= (int) $subject['id'] ?>">Tareas</a>
-            <a href="exams.php?asignatura=<?= (int) $subject['id'] ?>">Exámenes</a>
-            <a href="grades.php?asignatura=<?= (int) $subject['id'] ?>">Notas</a>
-          </span>
+          <a href="subjects.php?action=show&amp;id=<?= (int) $subject['id'] ?>" class="card__link"
+             aria-label="Ver la asignatura <?= e($subject['nombre']) ?>">
+            Ver asignatura <i class="ri-arrow-right-s-line" aria-hidden="true"></i>
+          </a>
         </footer>
       </article>
     <?php endforeach; ?>

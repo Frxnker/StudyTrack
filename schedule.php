@@ -146,10 +146,12 @@ if (is_post()) {
 $action = query('action');
 
 if ($action === 'new') {
-    $day = query('dia');
+    // Valores iniciales opcionales: schedule.php?action=new&dia=2&asignatura=3
+    $day     = query('dia');
+    $subject = query('asignatura');
     schedule_render_form($userId, [
         'id'            => 0,
-        'asignatura_id' => '',
+        'asignatura_id' => ctype_digit($subject) ? $subject : '',
         'dia_semana'    => isset(DAY_NAMES[(int) $day]) ? $day : (string) min((int) date('N'), 5),
         'hora_inicio'   => '',
         'hora_fin'      => '',
