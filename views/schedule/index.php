@@ -99,19 +99,43 @@ $weeklyHours = format_number($weeklyMinutes / 60, 1);
     </div>
   </section>
 
-  <!-- ============ Móvil: lista por día ============ -->
+  <!-- ============ Móvil: lista por día (plegable, con hoy abierto) ============ -->
+  <?php
+    // De lunes a viernes, y sábado/domingo solo si tienen clases
+    $listDays = array_values(array_filter(array_keys(DAY_NAMES), static fn (int $d): bool => $d <= 5 || $days[$d] !== []));
+    // Se abre hoy; si hoy no aparece (fin de semana sin clases), el siguiente día con clases
+    $openDay = in_array($today, $listDays, true) ? $today : null;
+    for ($i = 1; $openDay === null && $i <= 7; $i++) {
+        $candidate = ($today - 1 + $i) % 7 + 1;
+        if ($days[$candidate] !== []) {
+            $openDay = $candidate;
+        }
+    }
+  ?>
   <div class="day-list">
-    <?php foreach (DAY_NAMES as $day => $dayName): ?>
-      <?php if ($day > 5 && $days[$day] === []) continue; ?>
-      <section class="day-list__day<?= $day === $today ? ' is-today' : '' ?>" aria-labelledby="day-<?= $day ?>">
-        <h3 class="day-list__title" id="day-<?= $day ?>">
-          <?= e(ucfirst($dayName)) ?>
+    <?php foreach ($listDays as $day): ?>
+      <?php
+        $dayName  = DAY_NAMES[$day];
+        $dayItems = $days[$day];
+      ?>
+      <details class="card card--flush day-list__day<?= $day === $today ? ' is-today' : '' ?>"<?= $day === $openDay ? ' open' : '' ?>>
+        <summary class="day-list__summary">
+          <span class="day-list__name"><?= e(ucfirst($dayName)) ?></span>
           <?php if ($day === $today): ?><span class="badge badge--primary">Hoy</span><?php endif; ?>
-        </h3>
+          <span class="day-list__count">
+            <?php if ($dayItems): ?>
+              <?= e(plural(count($dayItems), 'clase', 'clases')) ?> ·
+              <?= e(format_time($dayItems[0]['hora_inicio'])) ?>–<?= e(format_time(end($dayItems)['hora_fin'])) ?>
+            <?php else: ?>
+              Sin clases
+            <?php endif; ?>
+          </span>
+          <i class="ri-arrow-down-s-line day-list__chevron" aria-hidden="true"></i>
+        </summary>
 
-        <?php if ($days[$day]): ?>
-          <ul class="card card--flush class-list">
-            <?php foreach ($days[$day] as $class): ?>
+        <?php if ($dayItems): ?>
+          <ul class="class-list">
+            <?php foreach ($dayItems as $class): ?>
               <li class="class-row" style="--subject: <?= e(safe_color($class['color'])) ?>">
                 <span class="class-row__time">
                   <strong><?= e(format_time($class['hora_inicio'])) ?></strong>
@@ -140,10 +164,10 @@ $weeklyHours = format_number($weeklyMinutes / 60, 1);
           </ul>
         <?php else: ?>
           <p class="day-list__empty">
-            Sin clases · <a href="schedule.php?action=new&amp;dia=<?= $day ?>">Añadir una</a>
+            No tienes clases este día. <a href="schedule.php?action=new&amp;dia=<?= $day ?>">Añadir una</a>
           </p>
         <?php endif; ?>
-      </section>
+      </details>
     <?php endforeach; ?>
   </div>
 <?php endif; ?>
