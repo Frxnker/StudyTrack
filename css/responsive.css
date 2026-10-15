@@ -95,7 +95,8 @@
   }
 
   .task,
-  .exam-row {
+  .exam-row,
+  .grade-row {
     gap: 1rem;
     padding: 1rem 1.35rem;
   }
@@ -315,6 +316,21 @@
 
   .subject-grid--cards {
     grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  /* Contenido a la izquierda, columna lateral a la derecha */
+  .split {
+    grid-template-columns: minmax(0, 1.6fr) minmax(300px, 1fr);
+  }
+
+  .split__main {
+    grid-row: 1;
+    grid-column: 1;
+  }
+
+  .split__side {
+    grid-row: 1;
+    grid-column: 2;
   }
 }
 
