@@ -1,0 +1,45 @@
+/* ==========================================================================
+   Inter (https://rsms.me/inter) · copia local, sin depender de Google Fonts
+   Pesos 400–800, subconjunto latino (incluye á, é, ñ, ü, ¿, ¡, «, », º, €…).
+   Archivos de @fontsource/inter 5.3.0 · Licencia SIL Open Font 1.1 (OFL.txt)
+   ========================================================================== */
+
+@font-face {
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("inter-latin-400-normal.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("inter-latin-500-normal.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("inter-latin-600-normal.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("inter-latin-700-normal.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 800;
+  font-display: swap;
+  src: url("inter-latin-800-normal.woff2") format("woff2");
+}

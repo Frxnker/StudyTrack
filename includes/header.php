@@ -33,11 +33,9 @@ $toastIcons = [
 
   <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
 
-  <!-- Tipografía Inter e iconos Remix Icon -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@4.6.0/fonts/remixicon.css">
+  <!-- Tipografía Inter e iconos Remix Icon: copias locales, la app funciona sin conexión -->
+  <link rel="stylesheet" href="<?= asset('assets/fonts/inter.css') ?>">
+  <link rel="stylesheet" href="<?= asset('assets/vendor/remixicon/remixicon.css') ?>">
 
   <link rel="stylesheet" href="<?= asset('css/style.css') ?>">
   <link rel="stylesheet" href="<?= asset('css/responsive.css') ?>">

@@ -16,8 +16,8 @@
   <meta name="robots" content="noindex">
   <title><?= e($title) ?> · <?= e(APP_NAME) ?></title>
   <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@4.6.0/fonts/remixicon.css">
+  <link rel="stylesheet" href="<?= asset('assets/fonts/inter.css') ?>">
+  <link rel="stylesheet" href="<?= asset('assets/vendor/remixicon/remixicon.css') ?>">
   <link rel="stylesheet" href="<?= asset('css/style.css') ?>">
   <link rel="stylesheet" href="<?= asset('css/responsive.css') ?>">
 </head>
