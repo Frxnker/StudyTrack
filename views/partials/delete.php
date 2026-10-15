@@ -12,6 +12,7 @@
  * @var string      $question  Título del diálogo
  * @var string|null $text      Explicación (qué se pierde al borrar)
  * @var bool|null   $full      true: botón con texto; false: solo icono
+ * @var string|null $return    Filtros del listado al que volver (campo oculto "return")
  */
 $text = $text ?? 'Esta acción no se puede deshacer.';
 ?>
@@ -20,6 +21,9 @@ $text = $text ?? 'Esta acción no se puede deshacer.';
   <?= csrf_field() ?>
   <input type="hidden" name="action" value="delete">
   <input type="hidden" name="id" value="<?= (int) $id ?>">
+  <?php if (!empty($return)): ?>
+    <input type="hidden" name="return" value="<?= e($return) ?>">
+  <?php endif; ?>
   <?php if (!empty($full)): ?>
     <button type="submit" class="btn btn--danger-soft">
       <i class="ri-delete-bin-6-line" aria-hidden="true"></i> <?= e($label) ?>

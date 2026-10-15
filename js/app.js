@@ -6,7 +6,7 @@
  * - Notificaciones (toasts)
  * - Mostrar/ocultar contraseña y medidor de seguridad
  * - Evitar envíos dobles de formularios
- * - Confirmación antes de borrar y selector de color
+ * - Confirmación antes de borrar, selector de color y filtros
  * - Sombra de la barra superior al hacer scroll
  * - Cuentas atrás de exámenes
  */
@@ -272,6 +272,24 @@ const App = (() => {
     });
   }
 
+  /* ---------- Filtros de los listados ----------
+   * - Los <select data-autosubmit> aplican el filtro en cuanto cambian.
+   * - El panel <details data-filters> se abre solo en escritorio (en móvil ocupa mucho).
+   */
+  function initFilters() {
+    $$('select[data-autosubmit]').forEach((select) => {
+      select.addEventListener('change', () => {
+        const form = select.form;
+        if (typeof form.requestSubmit === 'function') form.requestSubmit();
+        else form.submit();
+      });
+    });
+
+    if (window.matchMedia('(min-width: 1024px)').matches) {
+      $$('details[data-filters]').forEach((details) => { details.open = true; });
+    }
+  }
+
   /* ---------- Barra superior ---------- */
   function initTopbar() {
     const topbar = $('.topbar');
@@ -332,6 +350,7 @@ const App = (() => {
   initFormLoading();
   initConfirm();
   initColorPickers();
+  initFilters();
   initTopbar();
   initCountdowns();
 

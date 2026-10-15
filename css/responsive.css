@@ -52,6 +52,10 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
+  .segmented__option i {
+    display: inline;
+  }
+
   .modal__actions {
     flex-direction: row;
   }
@@ -64,6 +68,35 @@
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
+  }
+
+  .tabs {
+    margin-right: -1.5rem;
+    margin-left: -1.5rem;
+    padding-right: 1.5rem;
+    padding-left: 1.5rem;
+  }
+
+  .filters__form {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .filters__search,
+  .filters__actions {
+    grid-column: 1 / -1;
+  }
+
+  .filters__actions {
+    justify-content: flex-end;
+  }
+
+  .filters__actions .btn {
+    flex: none;
+  }
+
+  .task {
+    gap: 1rem;
+    padding: 1rem 1.35rem;
   }
 }
 
@@ -100,6 +133,14 @@
 
   .dash-week {
     order: 3; /* junto al próximo examen */
+  }
+
+  .tabs {
+    flex-wrap: wrap;
+    margin-right: 0;
+    margin-left: 0;
+    padding-right: 0;
+    padding-left: 0;
   }
 }
 
@@ -156,6 +197,17 @@
 
   .content {
     padding: 1.75rem 2rem 3rem;
+  }
+
+  /* Filtros en una sola fila */
+  .filters__form {
+    grid-template-columns: minmax(0, 1.6fr) repeat(3, minmax(0, 1fr)) auto;
+    align-items: end;
+  }
+
+  .filters__search,
+  .filters__actions {
+    grid-column: auto;
   }
 
   .toasts {

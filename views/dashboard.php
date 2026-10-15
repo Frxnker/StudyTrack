@@ -60,7 +60,7 @@ $passedPct    = $gradedCount > 0 ? (int) round($passedCount / $gradedCount * 100
     </section>
 
     <section class="stats dash-stats" aria-label="Resumen rápido">
-      <a href="tasks.php?estado=pendiente" class="stat stat--primary">
+      <a href="tasks.php?estado=abiertas" class="stat stat--primary">
         <span class="stat__icon"><i class="ri-list-check-3" aria-hidden="true"></i></span>
         <span class="stat__value" data-count-up="<?= $taskCounts['pendientes'] ?>"><?= $taskCounts['pendientes'] ?></span>
         <span class="stat__label">Tareas pendientes</span>
@@ -97,7 +97,7 @@ $passedPct    = $gradedCount > 0 ? (int) round($passedCount / $gradedCount * 100
           <?php foreach ($todayTasks as $task): ?>
             <?php $isOverdue = $task['fecha_limite'] < $today; ?>
             <li>
-              <a href="tasks.php" class="task-mini<?= $isOverdue ? ' is-overdue' : '' ?>"
+              <a href="tasks.php?action=edit&amp;id=<?= (int) $task['id'] ?>" class="task-mini<?= $isOverdue ? ' is-overdue' : '' ?>"
                  style="--subject: <?= e(safe_color($task['color'])) ?>">
                 <span class="task-mini__bar" aria-hidden="true"></span>
                 <span class="task-mini__body">
