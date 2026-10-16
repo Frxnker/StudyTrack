@@ -1,7 +1,9 @@
-# StudyTrack · aplicación (PHP + Apache) y base de datos (MySQL) con Docker
+# StudyTrack · aplicación (PHP + Apache), base de datos (MySQL) y sincronización
+# de calendarios con Docker
 #
 #   docker compose up -d --build   → arranca todo en http://localhost:8080
 #   docker compose logs -f app     → ver los errores de PHP
+#   docker compose logs -f sync    → ver las sincronizaciones de calendarios
 #   docker compose down            → para los contenedores (los datos se conservan)
 #   docker compose down -v         → para los contenedores y BORRA la base de datos
 #
@@ -10,23 +12,41 @@
 # Si no quieres los datos de ejemplo, comenta la línea de demo_data.sql.
 #
 # Las contraseñas y opciones se pueden cambiar en un archivo .env (ver .env.example).
+# Para conectar calendarios de Moodle o Classroom hace falta APP_KEY en .env.
+
+# Variables comunes de la app y del servicio de sincronización
+x-app-env: &app-env
+  DB_HOST: db
+  DB_PORT: 3306
+  DB_NAME: studytrack              # fijo: sql/database.sql crea y usa esta base de datos
+  DB_USER: ${DB_USER:-studytrack}
+  DB_PASS: ${DB_PASS:-studytrack}
+  APP_DEBUG: ${APP_DEBUG:-false}
+  TRUST_PROXY: ${TRUST_PROXY:-false}
+  APP_KEY: ${APP_KEY:-}            # cifra las URLs de los calendarios (ver .env.example)
 
 services:
   app:
     build: .
+    image: studytrack-app
     ports:
       - "${APP_PORT:-8080}:80"
-    environment:
-      DB_HOST: db
-      DB_PORT: 3306
-      DB_NAME: studytrack              # fijo: sql/database.sql crea y usa esta base de datos
-      DB_USER: ${DB_USER:-studytrack}
-      DB_PASS: ${DB_PASS:-studytrack}
-      APP_DEBUG: ${APP_DEBUG:-false}
-      TRUST_PROXY: ${TRUST_PROXY:-false}
+    environment: *app-env
     depends_on:
       db:
         condition: service_healthy   # espera a que MySQL haya terminado de importar el SQL
+    restart: unless-stopped
+
+  # Sincroniza los calendarios activos cada hora (cron/sync_calendars.php).
+  # Usa la misma imagen que la app; solo ejecuta el script en bucle.
+  sync:
+    build: .
+    image: studytrack-app
+    command: ["sh", "-c", "while true; do php /var/www/html/cron/sync_calendars.php; sleep 3600; done"]
+    environment: *app-env
+    depends_on:
+      db:
+        condition: service_healthy
     restart: unless-stopped
 
   db:

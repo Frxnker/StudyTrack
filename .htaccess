@@ -4,6 +4,6 @@
 Options -Indexes
 
 # Solo se accede directamente a las páginas de la raíz y a css/, js/ y assets/.
-# Las carpetas internas (configuración, modelos, plantillas, SQL…) responden 404.
-RedirectMatch 404 /(config|includes|models|views|sql)(/|$)
+# Las carpetas internas (configuración, modelos, plantillas, SQL, cron…) responden 404.
+RedirectMatch 404 /(config|includes|models|views|sql|cron)(/|$)
 RedirectMatch 404 /(\.git|\.env|\.docker|Dockerfile|docker-compose\.yml|README\.md)
