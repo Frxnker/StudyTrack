@@ -593,11 +593,12 @@ function calendar_feed_upsert_event(int $userId, int $calendarId, string $defaul
     $origin = calendar_feed_origin_text($event);
     $params = ['uid' => $userId, 'uid_externo' => $uid];
 
-    // ¿Ya se importó como examen? Solo se actualizan el nombre, la fecha y la hora
-    $exam = db_one('SELECT id, nombre, fecha, hora FROM examenes WHERE usuario_id = :uid AND uid_externo = :uid_externo', $params);
+    // ¿Ya se importó como examen? Solo se actualizan el nombre, la fecha y la hora.
+    // Si quedó sin calendario (se borró conservando lo importado), se vuelve a enlazar.
+    $exam = db_one('SELECT id, nombre, fecha, hora, calendario_id FROM examenes WHERE usuario_id = :uid AND uid_externo = :uid_externo', $params);
     if ($exam !== null) {
         $newTime = $time !== null ? $time . ':00' : $exam['hora'];
-        if ($exam['nombre'] === $title && $exam['fecha'] === $date && $exam['hora'] === $newTime) {
+        if ($exam['nombre'] === $title && $exam['fecha'] === $date && $exam['hora'] === $newTime && $exam['calendario_id'] !== null) {
             return ['resultado' => 'sin_cambios', 'con_asignatura' => true];
         }
         db_execute(
@@ -610,11 +611,12 @@ function calendar_feed_upsert_event(int $userId, int $calendarId, string $defaul
     }
 
     // ¿Ya se importó como tarea? Título y fecha; la asignatura solo si no tenía
-    $task = db_one('SELECT id, titulo, fecha_limite, asignatura_id FROM tareas WHERE usuario_id = :uid AND uid_externo = :uid_externo', $params);
+    $task = db_one('SELECT id, titulo, fecha_limite, asignatura_id, calendario_id FROM tareas WHERE usuario_id = :uid AND uid_externo = :uid_externo', $params);
     if ($task !== null) {
         $current    = $task['asignatura_id'] !== null ? (int) $task['asignatura_id'] : null;
         $newSubject = $current ?? $subjectId;
-        if ($task['titulo'] === $title && $task['fecha_limite'] === $date && $current === $newSubject) {
+        if ($task['titulo'] === $title && $task['fecha_limite'] === $date && $current === $newSubject
+            && $task['calendario_id'] !== null) {
             return ['resultado' => 'sin_cambios', 'con_asignatura' => $newSubject !== null];
         }
         db_execute(
