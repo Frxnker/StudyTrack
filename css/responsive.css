@@ -182,13 +182,14 @@
 
   .dash-hero,
   .dash-stats,
+  .dash-classes,
   .dash-today,
   .dash-subjects {
     grid-column: 1 / -1;
   }
 
   .dash-week {
-    order: 3; /* junto al próximo examen */
+    order: 4; /* junto al próximo examen */
   }
 
   .exam-grid,

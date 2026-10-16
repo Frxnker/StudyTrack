@@ -17,6 +17,7 @@
  * @var float|null $overallAverage
  * @var array      $goals           total, completados, progreso_medio
  * @var array      $week            total, completadas, porcentaje, por_dia, examenes, notas, rango
+ * @var array      $classes         bloques, ahora, pendientes, proximo, vacio (horario de hoy)
  * @var int        $gradedCount
  * @var int        $passedCount
  */
@@ -33,6 +34,18 @@ $ringOffset = $ringCirc * (1 - $ringValue);
 
 $completedPct = $taskCounts['total'] > 0 ? (int) round($taskCounts['completadas'] / $taskCounts['total'] * 100) : 0;
 $passedPct    = $gradedCount > 0 ? (int) round($passedCount / $gradedCount * 100) : 0;
+
+// Hoy en clase: ids de la clase actual y la siguiente, y aviso de la próxima clase
+$classNowId  = $classes['ahora']['ahora'] !== null ? (int) $classes['bloques'][$classes['ahora']['ahora']]['id'] : null;
+$classNextId = $classes['ahora']['despues'] !== null ? (int) $classes['bloques'][$classes['ahora']['despues']]['id'] : null;
+$classesDone = count($classes['bloques']) - count(array_filter($classes['pendientes'], static fn (array $i): bool => $i['tipo'] === 'clase'));
+$nextClassText = '';
+if ($classes['proximo'] !== null) {
+    [$nextDay, $nextBlock] = $classes['proximo'];
+    $dayText = $nextDay === (int) date('N') % 7 + 1 ? 'mañana' : 'el ' . DAY_NAMES[$nextDay];
+    $nextClassText = 'Tu próxima clase es ' . $dayText . ' a las ' . format_time($nextBlock['hora_inicio'])
+                   . ': ' . $nextBlock['asignatura'] . '.';
+}
 ?>
 <div class="dashboard">
 
@@ -80,6 +93,75 @@ $passedPct    = $gradedCount > 0 ? (int) round($passedCount / $gradedCount * 100
         <span class="stat__value" data-count-up="<?= $week['examenes'] ?>"><?= $week['examenes'] ?></span>
         <span class="stat__label">Exámenes esta semana</span>
       </a>
+    </section>
+
+    <section class="card dash-classes" aria-labelledby="dash-classes-title">
+      <header class="card__header">
+        <h3 class="card__title" id="dash-classes-title"><i class="ri-time-line" aria-hidden="true"></i> Hoy en clase</h3>
+        <a href="schedule.php" class="card__link">Horario <i class="ri-arrow-right-s-line" aria-hidden="true"></i></a>
+      </header>
+
+      <?php if ($classes['pendientes']): ?>
+        <?php if ($classesDone > 0): ?>
+          <p class="dash-classes__note"><?= e(plural($classesDone, 'clase terminada', 'clases terminadas')) ?> hoy</p>
+        <?php endif; ?>
+        <ul class="class-list class-list--compact">
+          <?php foreach ($classes['pendientes'] as $item): ?>
+            <?php if ($item['tipo'] === 'descanso'): ?>
+              <?php $isBreakNow = $classes['ahora']['descanso'] !== null && $classes['ahora']['descanso']['inicio'] === $item['inicio']; ?>
+              <li class="class-break<?= $isBreakNow ? ' is-now' : '' ?>">
+                <span class="class-row__time">
+                  <strong><?= e($item['inicio']) ?></strong>
+                  <span><?= e($item['fin']) ?></span>
+                </span>
+                <span class="class-break__label"><i class="ri-cup-line" aria-hidden="true"></i> <?= e($item['texto']) ?></span>
+                <?php if ($isBreakNow): ?><span class="badge badge--primary">Ahora</span><?php endif; ?>
+              </li>
+              <?php continue; ?>
+            <?php endif; ?>
+            <?php
+              $isNow  = (int) $item['id'] === $classNowId;
+              $isNext = (int) $item['id'] === $classNextId;
+            ?>
+            <li class="class-row<?= $isNow ? ' is-now' : '' ?>" style="--subject: <?= e(safe_color($item['color'])) ?>">
+              <span class="class-row__time">
+                <strong><?= e(format_time($item['hora_inicio'])) ?></strong>
+                <span><?= e(format_time($item['hora_fin'])) ?></span>
+              </span>
+              <span class="class-row__bar" aria-hidden="true"></span>
+              <a href="subjects.php?action=show&amp;id=<?= (int) $item['asignatura_id'] ?>" class="class-row__body">
+                <span class="class-row__name">
+                  <?= e($item['asignatura']) ?>
+                  <?php if ($isNow): ?>
+                    <span class="badge badge--primary">Ahora</span>
+                  <?php elseif ($isNext): ?>
+                    <span class="badge">Después</span>
+                  <?php endif; ?>
+                </span>
+                <?php if ($item['aula']): ?>
+                  <span class="class-row__meta"><span><i class="ri-map-pin-line" aria-hidden="true"></i> <?= e($item['aula']) ?></span></span>
+                <?php endif; ?>
+              </a>
+            </li>
+          <?php endforeach; ?>
+        </ul>
+      <?php elseif ($classes['vacio']): ?>
+        <?php partial('empty', [
+            'icon'        => 'ri-time-line',
+            'title'       => 'Tu horario está vacío',
+            'text'        => 'Añade tus clases y aquí verás cuál toca ahora y cuál después.',
+            'actionHref'  => 'schedule.php?action=new',
+            'actionLabel' => 'Añadir clase',
+            'compact'     => true,
+        ]); ?>
+      <?php else: ?>
+        <?php partial('empty', [
+            'icon'    => 'ri-cup-line',
+            'title'   => $classes['bloques'] ? 'Has terminado las clases de hoy' : 'Hoy no tienes clase',
+            'text'    => $nextClassText,
+            'compact' => true,
+        ]); ?>
+      <?php endif; ?>
     </section>
 
     <section class="card dash-today">

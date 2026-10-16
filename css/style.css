@@ -2407,12 +2407,13 @@ a.stat:hover {
 
 .dash-hero     { order: 1; }
 .dash-stats    { order: 2; }
-.dash-exam     { order: 3; }
-.dash-today    { order: 4; }
-.dash-week     { order: 5; }
-.dash-progress { order: 6; }
-.dash-grades   { order: 7; }
-.dash-subjects { order: 8; }
+.dash-classes  { order: 3; }
+.dash-exam     { order: 4; }
+.dash-today    { order: 5; }
+.dash-week     { order: 6; }
+.dash-progress { order: 7; }
+.dash-grades   { order: 8; }
+.dash-subjects { order: 9; }
 
 .hero__actions {
   display: flex;
@@ -3168,13 +3169,69 @@ a.grade-mini__subject:hover {
 }
 
 .timetable__name {
+  display: -webkit-box;
+  overflow: hidden;
   font-weight: 700;
   overflow-wrap: anywhere;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
 }
 
 .timetable__meta {
+  overflow: hidden;
   font-size: .72rem;
+  white-space: nowrap;
+  text-overflow: ellipsis;
   opacity: .85;
+}
+
+/* Clase actual ("Ahora") y siguiente ("Después") */
+.timetable__class.is-now {
+  z-index: 1;
+  box-shadow: 0 0 0 2px var(--c-primary), var(--shadow-md);
+}
+
+.timetable__class.is-next {
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--c-primary) 45%, transparent);
+}
+
+.timetable__badge {
+  display: inline-block;
+  margin-right: .2rem;
+  padding: 0 .35rem;
+  vertical-align: 1px;
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius-full);
+  background: var(--c-surface);
+  color: var(--c-text-2);
+  font-size: .62rem;
+  font-weight: 700;
+  letter-spacing: .03em;
+  text-transform: uppercase;
+}
+
+.timetable__badge--now {
+  border-color: transparent;
+  background: var(--c-primary);
+  color: #fff;
+}
+
+/* Recreo: banda rayada en todas las columnas (no es una franja de la base de datos) */
+.timetable__break {
+  position: absolute;
+  top: calc(var(--top) * var(--hour-h) / 60);
+  right: 0;
+  left: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: .3rem;
+  height: calc(var(--len) * var(--hour-h) / 60);
+  background: repeating-linear-gradient(-45deg, var(--c-surface-2) 0 6px, var(--c-surface-3) 6px 12px);
+  color: var(--c-text-2);
+  font-size: .72rem;
+  font-weight: 600;
+  pointer-events: none;
 }
 
 /* --- Horario: lista por día (móvil y tablet) --- */
@@ -3308,6 +3365,59 @@ a.grade-mini__subject:hover {
   display: inline-flex;
   align-items: center;
   gap: .25rem;
+}
+
+.class-row__name .badge {
+  margin-left: .3rem;
+  vertical-align: 1px;
+}
+
+.class-row.is-now {
+  background: color-mix(in srgb, var(--c-primary) 7%, transparent);
+}
+
+/* Recreo dentro de la lista del día */
+.class-break {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  padding: .55rem .5rem .55rem 1rem;
+  background: repeating-linear-gradient(-45deg, var(--c-surface-2) 0 6px, var(--c-surface) 6px 12px);
+  color: var(--c-text-2);
+  font-size: .85rem;
+}
+
+.class-break.is-now {
+  background: color-mix(in srgb, var(--c-primary) 7%, transparent);
+}
+
+.class-break__label {
+  display: inline-flex;
+  align-items: center;
+  gap: .35rem;
+  font-weight: 600;
+}
+
+/* Versión compacta (dashboard: "Hoy en clase") */
+.class-list--compact .class-row,
+.class-list--compact .class-break {
+  padding-right: 0;
+  padding-left: 0;
+}
+
+.class-list--compact .class-row.is-now,
+.class-list--compact .class-break {
+  margin: 0 -.5rem;
+  padding-right: .5rem;
+  padding-left: .5rem;
+  border-radius: var(--radius-sm);
+}
+
+.dash-classes__note {
+  margin-bottom: .25rem;
+  color: var(--c-text-3);
+  font-size: var(--fs-xs);
+  font-weight: 600;
 }
 
 /* --- Calendario mensual ---

@@ -261,7 +261,7 @@ $nextExam    = $upcoming[0] ?? null;
   </section>
 
   <!-- Horario -->
-  <section class="card" aria-labelledby="classes-title">
+  <section class="card" id="horario" aria-labelledby="classes-title">
     <header class="card__header">
       <h3 class="card__title" id="classes-title"><i class="ri-time-line" aria-hidden="true"></i> Horario</h3>
     </header>

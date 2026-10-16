@@ -15,6 +15,7 @@ require_once BASE_PATH . '/models/exam.php';
 require_once BASE_PATH . '/models/grade.php';
 require_once BASE_PATH . '/models/subject.php';
 require_once BASE_PATH . '/models/goal.php';
+require_once BASE_PATH . '/models/schedule.php';
 
 require_login();
 
@@ -36,6 +37,23 @@ $week['por_dia']  = task_completed_by_day($userId, $weekStart, $weekEnd);
 $week['examenes'] = exam_count_between($userId, $weekStart, $weekEnd);
 $week['notas']    = grade_count_between($userId, $weekStart, $weekEnd);
 $week['rango']    = format_date_range($weekStart, $weekEnd);
+
+// --- Hoy en clase: lo que queda de hoy, con la clase actual y la siguiente ----
+$scheduleDays = schedule_by_day($userId);
+$weekday      = (int) date('N');
+$nowTime      = date('H:i');
+$classBlocks  = schedule_merge_blocks($scheduleDays[$weekday]);
+$classes      = [
+    'bloques'    => $classBlocks,
+    'ahora'      => schedule_now_next($classBlocks, $nowTime),
+    // Bloques y recreos que aún no han terminado
+    'pendientes' => array_values(array_filter(
+        schedule_day_items($classBlocks),
+        static fn (array $item): bool => time_to_minutes($item['hora_fin']) > time_to_minutes($nowTime)
+    )),
+    'proximo'    => schedule_next_day($scheduleDays, $weekday),
+    'vacio'      => array_merge(...array_values($scheduleDays)) === [],
+];
 
 // Asignaturas aprobadas (de las que ya tienen alguna nota)
 $gradedSubjects = array_filter($subjects, static fn (array $s): bool => $s['media'] !== null);
@@ -82,6 +100,7 @@ render('dashboard', [
     'overallAverage' => $overallAverage,
     'goals'          => $goals,
     'week'           => $week,
+    'classes'        => $classes,
     'gradedCount'    => count($gradedSubjects),
     'passedCount'    => count($passedSubjects),
     'fab'            => ['href' => 'tasks.php?action=new', 'label' => 'Nueva tarea'],

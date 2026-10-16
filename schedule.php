@@ -173,20 +173,36 @@ if ($action === 'edit') {
 
 $days    = schedule_by_day($userId);
 $classes = array_merge(...array_values($days));
+$today   = (int) date('N');
 
-// Rango de horas de la rejilla: como mínimo de 8:00 a 14:00, ampliado si hace falta
-$firstHour = 8;
-$lastHour  = 14;
+// Horas seguidas de la misma asignatura unidas en un solo bloque
+$blocks = array_map('schedule_merge_blocks', $days);
+
+// Rango de la rejilla: de la primera a la última clase (en punto o y media),
+// por ejemplo 08:00–14:30. Sin clases, de 8:00 a 14:00.
+$gridStart = $classes ? PHP_INT_MAX : 8 * 60;
+$gridEnd   = $classes ? 0 : 14 * 60;
 foreach ($classes as $class) {
-    $firstHour = min($firstHour, intdiv(time_to_minutes($class['hora_inicio']), 60));
-    $lastHour  = max($lastHour, (int) ceil(time_to_minutes($class['hora_fin']) / 60));
+    $gridStart = min($gridStart, time_to_minutes($class['hora_inicio']));
+    $gridEnd   = max($gridEnd, time_to_minutes($class['hora_fin']));
 }
+$gridStart = intdiv($gridStart, 60) * 60;          // 08:10 → 08:00
+$gridEnd   = (int) ceil($gridEnd / 30) * 30;       // 14:20 → 14:30
 
 // De lunes a viernes; sábado y domingo solo si tienen clases
 $visibleDays = array_filter(
     array_keys(DAY_NAMES),
     static fn (int $day): bool => $day <= 5 || $days[$day] !== []
 );
+
+// Clase actual y siguiente de hoy ("Ahora" / "Después")
+$nowNext = schedule_now_next($blocks[$today], date('H:i'));
+
+// Descansos (recreo) que caen dentro de la rejilla
+$breaks = array_values(array_filter(
+    schedule_breaks(),
+    static fn (array $b): bool => $b['desde'] >= $gridStart && $b['hasta'] <= $gridEnd
+));
 
 // Horas lectivas a la semana
 $weeklyMinutes = array_sum(array_map(
@@ -197,12 +213,15 @@ $weeklyMinutes = array_sum(array_map(
 render('schedule/index', [
     'pageTitle'     => 'Horario',
     'days'          => $days,
+    'blocks'        => $blocks,
     'visibleDays'   => $visibleDays,
-    'firstHour'     => $firstHour,
-    'lastHour'      => $lastHour,
+    'gridStart'     => $gridStart,
+    'gridEnd'       => $gridEnd,
+    'breaks'        => $breaks,
+    'nowNext'       => $nowNext,
     'classCount'    => count($classes),
     'weeklyMinutes' => $weeklyMinutes,
     'hasSubjects'   => subject_options($userId) !== [],
-    'today'         => (int) date('N'),
+    'today'         => $today,
     'fab'           => ['href' => 'schedule.php?action=new', 'label' => 'Nueva clase'],
 ]);

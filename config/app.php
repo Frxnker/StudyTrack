@@ -45,3 +45,7 @@ define('SESSION_TIMEOUT', 2 * 60 * 60); // segundos de inactividad antes de cerr
 
 // Nota mínima para considerar aprobada una evaluación (escala 0–10)
 define('PASS_MARK', 5.0);
+
+// Descansos de la jornada: [inicio, fin, texto]. El horario los dibuja como una banda
+// entre las clases (no son franjas de la base de datos).
+define('SCHOOL_BREAKS', [['11:00', '11:30', 'Recreo']]);
