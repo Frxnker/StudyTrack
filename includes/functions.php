@@ -527,6 +527,27 @@ function format_long_date(?string $date = null, bool $withYear = false): string
 }
 
 /**
+ * Fecha y hora relativas: "hoy a las 10:45", "ayer a las 18:00" o "14/10/2026 a las 9:05".
+ */
+function format_moment(?string $datetime): string
+{
+    if ($datetime === null || $datetime === '') {
+        return '';
+    }
+    $timestamp = strtotime($datetime);
+    if ($timestamp === false) {
+        return '';
+    }
+    $day = match (date('Y-m-d', $timestamp)) {
+        today()                             => 'hoy',
+        date('Y-m-d', strtotime('-1 day'))  => 'ayer',
+        default                             => date('d/m/Y', $timestamp),
+    };
+
+    return $day . ' a las ' . date('G:i', $timestamp);
+}
+
+/**
  * Días que faltan hasta una fecha (negativo si ya pasó).
  */
 function days_until(string $date): int

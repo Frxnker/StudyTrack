@@ -38,9 +38,10 @@ function exam_upcoming(int $userId, int $subjectId = 0): array
 
     return db_all(
         "SELECT e.id, e.asignatura_id, e.nombre, e.fecha, e.hora, e.aula, e.descripcion, e.estado,
-                a.nombre AS asignatura, a.color
+                a.nombre AS asignatura, a.color, c.origen AS calendario_origen
            FROM examenes e
            JOIN asignaturas a ON a.id = e.asignatura_id
+           LEFT JOIN calendarios_externos c ON c.id = e.calendario_id AND c.usuario_id = e.usuario_id
           WHERE {$where}
             AND e.fecha >= :hoy
             AND e.estado <> 'realizado'
@@ -58,9 +59,10 @@ function exam_past(int $userId, int $subjectId = 0): array
 
     return db_all(
         "SELECT e.id, e.asignatura_id, e.nombre, e.fecha, e.hora, e.aula, e.descripcion, e.estado,
-                a.nombre AS asignatura, a.color
+                a.nombre AS asignatura, a.color, c.origen AS calendario_origen
            FROM examenes e
            JOIN asignaturas a ON a.id = e.asignatura_id
+           LEFT JOIN calendarios_externos c ON c.id = e.calendario_id AND c.usuario_id = e.usuario_id
           WHERE {$where}
             AND (e.fecha < :hoy OR e.estado = 'realizado')
           ORDER BY e.fecha DESC, e.hora DESC",
@@ -102,13 +104,16 @@ function exam_subject_filter(int $userId, int $subjectId): array
 
 /**
  * Un examen del usuario o null si no existe (o es de otro usuario).
+ * Si se importó de un calendario externo, incluye su nombre y su origen.
  */
 function exam_find(int $userId, int $id): ?array
 {
     return db_one(
-        'SELECT id, asignatura_id, nombre, fecha, hora, aula, descripcion, estado
-           FROM examenes
-          WHERE id = :id AND usuario_id = :uid',
+        'SELECT e.id, e.asignatura_id, e.nombre, e.fecha, e.hora, e.aula, e.descripcion, e.estado,
+                c.nombre AS calendario, c.origen AS calendario_origen
+           FROM examenes e
+           LEFT JOIN calendarios_externos c ON c.id = e.calendario_id AND c.usuario_id = e.usuario_id
+          WHERE e.id = :id AND e.usuario_id = :uid',
         ['id' => $id, 'uid' => $userId]
     );
 }

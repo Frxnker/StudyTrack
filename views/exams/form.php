@@ -26,6 +26,16 @@ $backUrl     = exam_list_url($subjectFilter);
   <?php endif; ?>
 </header>
 
+<?php if (!empty($exam['calendario'])): ?>
+  <p class="alert alert--info card--form mb-2">
+    <i class="ri-links-line" aria-hidden="true"></i>
+    <span>
+      Importado del calendario «<?= e($exam['calendario']) ?>». Al sincronizar se actualizan su nombre, su fecha y su hora;
+      el resto de datos y el estado se respetan.
+    </span>
+  </p>
+<?php endif; ?>
+
 <?php if (!$subjects): ?>
   <section class="card card--form">
     <?php partial('empty', [

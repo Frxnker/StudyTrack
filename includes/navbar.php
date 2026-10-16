@@ -25,7 +25,8 @@ $navSections = [
         'goals'    => ['Objetivos', 'ri-focus-3'],
     ],
     'Cuenta' => [
-        'profile' => ['Perfil', 'ri-user-3'],
+        'profile'   => ['Perfil', 'ri-user-3'],
+        'calendars' => ['Calendarios', 'ri-links'],
     ],
 ];
 

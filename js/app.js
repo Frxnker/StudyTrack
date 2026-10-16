@@ -190,6 +190,8 @@ const App = (() => {
 
   /* ---------- Confirmación antes de borrar ----------
    * <form method="post" data-confirm="¿Eliminar «X»?" data-confirm-text="No se puede deshacer.">
+   * Si el formulario tiene varios botones, cada uno puede llevar su propio
+   * data-confirm-text, y al confirmar se envía el botón pulsado (su name/value).
    * Se escucha en fase de captura para actuar antes que initFormLoading.
    */
   function confirmDialog(title, text) {
@@ -247,15 +249,17 @@ const App = (() => {
       event.preventDefault();
       event.stopPropagation();
       const opener = event.submitter || document.activeElement;
+      const submitter = event.submitter && event.submitter.form === form ? event.submitter : null;
+      const text = submitter?.dataset.confirmText || form.dataset.confirmText || '';
 
-      confirmDialog(form.dataset.confirm, form.dataset.confirmText || '').then((ok) => {
+      confirmDialog(form.dataset.confirm, text).then((ok) => {
         if (!ok) {
           opener?.focus?.(); // Devolvemos el foco al botón que abrió el diálogo
           return;
         }
         form.dataset.confirmed = '1';
         if (typeof form.requestSubmit === 'function') {
-          form.requestSubmit();
+          form.requestSubmit(submitter); // con el botón pulsado: se envía su name/value
         } else {
           form.submit();
         }

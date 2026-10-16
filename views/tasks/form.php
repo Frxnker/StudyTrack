@@ -20,6 +20,16 @@ $backUrl       = task_list_url($filters);
   </div>
 </header>
 
+<?php if (!empty($task['calendario'])): ?>
+  <p class="alert alert--info card--form mb-2">
+    <i class="ri-links-line" aria-hidden="true"></i>
+    <span>
+      Importada del calendario «<?= e($task['calendario']) ?>». Al sincronizar se actualizan su título y su fecha;
+      el estado, la prioridad y la asignatura que elijas se respetan.
+    </span>
+  </p>
+<?php endif; ?>
+
 <section class="card card--form">
   <form method="post" action="tasks.php" class="form" data-loading>
     <?= csrf_field() ?>

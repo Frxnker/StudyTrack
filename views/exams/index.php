@@ -75,7 +75,10 @@ $editUrl     = static fn (array $exam): string => 'exams.php?action=edit&id=' . 
           <article class="card exam-card<?= $i === 0 ? ' exam-card--next' : '' ?>"
                    style="--subject: <?= e(safe_color($exam['color'])) ?>" aria-labelledby="exam-<?= (int) $exam['id'] ?>">
             <header class="exam-card__header">
-              <span class="chip"><span class="dot" aria-hidden="true"></span><?= e($exam['asignatura']) ?></span>
+              <span class="exam-card__tags">
+                <span class="chip"><span class="dot" aria-hidden="true"></span><?= e($exam['asignatura']) ?></span>
+                <?php partial('source_badge', ['origin' => $exam['calendario_origen']]); ?>
+              </span>
               <div class="exam-card__actions">
                 <a href="<?= e($editUrl($exam)) ?>" class="icon-btn icon-btn--sm"
                    aria-label="Editar <?= e($exam['nombre']) ?>" title="Editar">
@@ -157,6 +160,7 @@ $editUrl     = static fn (array $exam): string => 'exams.php?action=edit&id=' . 
                 <?php else: ?>
                   <span class="badge badge--<?= $statusBadge[$exam['estado']] ?>"><?= e(EXAM_STATUSES[$exam['estado']]) ?></span>
                 <?php endif; ?>
+                <?php partial('source_badge', ['origin' => $exam['calendario_origen']]); ?>
               </div>
             </div>
 

@@ -26,7 +26,8 @@
    19. Objetivos
    20. Estadísticas
    21. Perfil
-   22. Animaciones
+   22. Calendarios externos (Moodle, Classroom)
+   23. Animaciones
    ========================================================================== */
 
 
@@ -4154,8 +4155,399 @@ a.grade-mini__subject:hover {
   color: var(--c-danger);
 }
 
+/* Tarjeta que enlaza a otra pantalla (calendarios externos) */
+.profile-link {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: .75rem 1rem;
+}
 
-/* 22. Animaciones
+.profile-link__icon {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: var(--c-primary-soft);
+  color: var(--c-primary);
+  font-size: 1.3rem;
+}
+
+.profile-link__body {
+  flex: 1 1 220px;
+  min-width: 0;
+}
+
+
+/* 22. Calendarios externos (Moodle, Classroom)
+   ========================================================================== */
+.feed-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1rem;
+}
+
+/* Icono del origen: "M" de Moodle, Google para Classroom */
+.feed-icon {
+  --brand: var(--c-primary);
+  display: inline-grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--brand) 16%, transparent);
+  color: color-mix(in srgb, var(--brand) 75%, var(--c-text));
+  font-size: 1.35rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.feed-icon--moodle    { --brand: #F98012; }
+.feed-icon--classroom { --brand: #1E8E3E; }
+
+.feed-icon--sm {
+  width: 26px;
+  height: 26px;
+  border-radius: 8px;
+  font-size: .85rem;
+}
+
+.feed-card {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.feed-card__header,
+.feed-summary {
+  display: flex;
+  align-items: center;
+  gap: .85rem;
+}
+
+.feed-card__heading,
+.feed-summary__body {
+  flex: 1;
+  min-width: 0;
+}
+
+.feed-card__title {
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.feed-card__origin {
+  color: var(--c-text-2);
+  font-size: .82rem;
+  overflow-wrap: anywhere;
+}
+
+.feed-card__facts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: .75rem 1rem;
+  margin: 0;
+}
+
+.feed-card__facts dt {
+  margin-bottom: .2rem;
+  color: var(--c-text-3);
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+
+.feed-card__facts dd {
+  margin: 0;
+  font-size: .9rem;
+}
+
+.feed-card__url {
+  color: var(--c-text-2);
+  word-break: break-all; /* la URL se corta donde haga falta, junto al candado */
+}
+
+.feed-card__footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: .5rem;
+  padding-top: .85rem;
+  border-top: 1px solid var(--c-border);
+}
+
+/* "Eliminar" se despliega y pregunta qué hacer con lo importado */
+.feed-card__more > summary {
+  list-style: none;
+}
+
+.feed-card__more > summary::-webkit-details-marker {
+  display: none;
+}
+
+.feed-card__more[open] {
+  flex-basis: 100%;
+}
+
+.feed-card__more[open] > summary {
+  color: var(--c-danger);
+}
+
+.feed-delete {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .5rem;
+}
+
+.feed-card__more .feed-delete {
+  margin-top: .6rem;
+  padding: .75rem;
+  border-radius: var(--radius);
+  background: var(--c-surface-2);
+}
+
+/* Ayuda plegable: cómo conseguir la URL */
+.feed-help {
+  padding: 0;
+}
+
+.feed-help__summary {
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+  min-height: 56px;
+  padding: .85rem 1.1rem;
+  font-weight: 600;
+  list-style: none;
+  cursor: pointer;
+}
+
+.feed-help__summary::-webkit-details-marker {
+  display: none;
+}
+
+.feed-help__summary > i:first-child {
+  color: var(--c-primary);
+  font-size: 1.2rem;
+}
+
+.feed-help__chevron {
+  margin-left: auto;
+  color: var(--c-text-3);
+  font-size: 1.3rem;
+  transition: transform var(--dur) var(--ease);
+}
+
+.feed-help[open] .feed-help__chevron {
+  transform: rotate(180deg);
+}
+
+.feed-help__body {
+  display: grid;
+  gap: 1.25rem;
+  padding: 1rem 1.1rem 1.2rem;
+  border-top: 1px solid var(--c-border);
+}
+
+.feed-help__title {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  margin-bottom: .5rem;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.feed-help__steps {
+  margin: 0 0 .5rem;
+  padding-left: 1.25rem;
+  font-size: .9rem;
+  line-height: 1.55;
+  list-style: decimal;
+}
+
+.feed-help__steps li + li {
+  margin-top: .3rem;
+}
+
+/* Pendientes de asignar */
+.pending-list > li + li,
+.mapping-list > li + li,
+.preview-list > li + li {
+  border-top: 1px solid var(--c-border);
+}
+
+.pending {
+  display: flex;
+  flex-direction: column;
+  gap: .5rem;
+  padding: .9rem 0;
+}
+
+.pending__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: .4rem .6rem;
+}
+
+.pending__text {
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.pending__tasks {
+  color: var(--c-text-2);
+  font-size: .85rem;
+}
+
+.pending__tasks li + li {
+  margin-top: .15rem;
+}
+
+.pending__form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: .5rem .75rem;
+}
+
+.pending__form .select {
+  flex: 1 1 220px;
+}
+
+/* Correspondencias guardadas */
+.mapping {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: .4rem .6rem;
+  padding: .6rem 0;
+}
+
+.mapping__text {
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.mapping__delete {
+  margin-left: auto;
+}
+
+/* Casilla de verificación con texto */
+.check {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: .6rem;
+  font-size: .9rem;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.check input {
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  margin-top: .1rem;
+  accent-color: var(--c-primary);
+}
+
+.check__hint {
+  display: block;
+  color: var(--c-text-3);
+  font-size: .8rem;
+  font-weight: 400;
+}
+
+.check--sm {
+  font-size: .82rem;
+}
+
+/* Desplegable de asignatura con su color */
+.select-swatch {
+  position: relative;
+}
+
+.select-swatch__dot {
+  position: absolute;
+  top: 50%;
+  left: .9rem;
+  width: 12px;
+  height: 12px;
+  border: 1px solid var(--c-border-strong);
+  border-radius: 50%;
+  background: var(--subject, transparent);
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+.select-swatch .select {
+  padding-left: 2.2rem;
+}
+
+/* Ayuda según el origen elegido (Moodle o Classroom) */
+.feed-hint {
+  display: none;
+}
+
+.feed-form:has(input[name="origen"][value="moodle"]:checked) .feed-hint--moodle,
+.feed-form:has(input[name="origen"][value="classroom"]:checked) .feed-hint--classroom {
+  display: inline;
+}
+
+/* Vista previa */
+.feed-summary__settings {
+  margin-top: .35rem;
+  color: var(--c-text-2);
+  font-size: .85rem;
+}
+
+.feed-stats {
+  margin-top: 1rem;
+}
+
+.preview-item {
+  display: flex;
+  align-items: flex-start;
+  gap: .85rem;
+  padding: .75rem 0;
+}
+
+.preview-item__body {
+  flex: 1;
+  min-width: 0;
+}
+
+.preview-item__title {
+  margin-bottom: .3rem;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+/* Insignia "Moodle" / "Classroom" en tareas y exámenes importados */
+.badge--source {
+  --brand: var(--c-primary);
+  background: color-mix(in srgb, var(--brand) 14%, transparent);
+  color: color-mix(in srgb, var(--brand) 70%, var(--c-text));
+}
+
+.badge--moodle    { --brand: #F98012; }
+.badge--classroom { --brand: #1E8E3E; }
+
+.exam-card__tags {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: .35rem;
+  min-width: 0;
+}
+
+
+/* 23. Animaciones
    ========================================================================== */
 @keyframes page-in {
   from { opacity: 0; transform: translateY(8px); }

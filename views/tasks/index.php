@@ -183,6 +183,7 @@ $activeFilters = count($listFilters);
                   <span class="sr-only">Prioridad</span> <?= e(TASK_PRIORITIES[$task['prioridad']]) ?>
                 </span>
               <?php endif; ?>
+              <?php partial('source_badge', ['origin' => $task['calendario_origen']]); ?>
             </div>
           </div>
 

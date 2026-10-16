@@ -30,9 +30,11 @@ function task_list(int $userId, array $filters = []): array
 
     return db_all(
         "SELECT t.id, t.titulo, t.descripcion, t.fecha_limite, t.prioridad, t.estado,
-                t.fecha_completada, t.asignatura_id, a.nombre AS asignatura, a.color
+                t.fecha_completada, t.asignatura_id, a.nombre AS asignatura, a.color,
+                c.origen AS calendario_origen
            FROM tareas t
            LEFT JOIN asignaturas a ON a.id = t.asignatura_id
+           LEFT JOIN calendarios_externos c ON c.id = t.calendario_id AND c.usuario_id = t.usuario_id
           WHERE {$where}
           ORDER BY t.estado = 'completada',
                    t.fecha_limite IS NULL, t.fecha_limite,
@@ -134,13 +136,16 @@ function task_between(int $userId, string $start, string $end): array
 
 /**
  * Una tarea del usuario o null si no existe (o es de otro usuario).
+ * Si se importó de un calendario externo, incluye su nombre y su origen.
  */
 function task_find(int $userId, int $id): ?array
 {
     return db_one(
-        'SELECT id, asignatura_id, titulo, descripcion, fecha_limite, prioridad, estado, fecha_completada
-           FROM tareas
-          WHERE id = :id AND usuario_id = :uid',
+        'SELECT t.id, t.asignatura_id, t.titulo, t.descripcion, t.fecha_limite, t.prioridad, t.estado,
+                t.fecha_completada, c.nombre AS calendario, c.origen AS calendario_origen
+           FROM tareas t
+           LEFT JOIN calendarios_externos c ON c.id = t.calendario_id AND c.usuario_id = t.usuario_id
+          WHERE t.id = :id AND t.usuario_id = :uid',
         ['id' => $id, 'uid' => $userId]
     );
 }

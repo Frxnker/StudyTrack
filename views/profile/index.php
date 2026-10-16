@@ -112,6 +112,18 @@ $delErrors  = $errors['delete'];
     </form>
   </section>
 
+  <!-- Calendarios externos -->
+  <section class="card card--form profile-link" aria-labelledby="calendarios-title">
+    <span class="profile-link__icon" aria-hidden="true"><i class="ri-links-line"></i></span>
+    <div class="profile-link__body">
+      <h3 class="card__title" id="calendarios-title">Calendarios de Moodle y Classroom</h3>
+      <p class="text-muted text-sm">Importa tus entregas y exámenes con la URL iCal de cada calendario. Solo fechas y títulos, nunca las notas.</p>
+    </div>
+    <a href="calendars.php" class="btn btn--secondary btn--sm">
+      Gestionar <i class="ri-arrow-right-s-line" aria-hidden="true"></i>
+    </a>
+  </section>
+
   <!-- Contraseña -->
   <section class="card card--form" aria-labelledby="password-title">
     <header class="card__header">
