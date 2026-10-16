@@ -12,16 +12,17 @@ que funciona igual de bien en el móvil que en el ordenador, con tema claro y os
 
 | Sección | Qué puedes hacer |
 | --- | --- |
-| **Inicio** | Resumen del día: tareas para hoy y atrasadas, exámenes de la semana, cuenta atrás del próximo examen, progreso académico (media general), resumen semanal y últimas notas. |
+| **Inicio** | Resumen del día: tareas para hoy y atrasadas, exámenes de la semana, «Hoy en clase» (la clase de ahora y la siguiente), cuenta atrás del próximo examen, progreso académico (media general), resumen semanal y últimas notas. |
 | **Asignaturas** | Crear, editar y borrar asignaturas con profesor, curso y color (paleta o color libre). Cada tarjeta muestra la media, las tareas pendientes y el próximo examen; el detalle reúne sus tareas, exámenes, notas y horario. |
 | **Tareas** | Tareas con asignatura opcional, fecha límite, prioridad y estado. Pestañas (hoy, próximos 7 días, atrasadas), filtros, búsqueda y completar en un clic. Se resaltan las vencidas y las de hoy. |
 | **Exámenes** | Próximos exámenes con cuenta atrás y exámenes pasados. Un examen realizado tiene el botón «Añadir nota», que abre el formulario de notas ya rellenado. |
 | **Notas** | Calificaciones de 0 a 10 (con coma o punto y hasta dos decimales) por tipo, agrupadas por asignatura con su media, media general y aprobado/suspenso. |
-| **Horario** | Clases semanales sin solapes: rejilla en escritorio y lista por día en el móvil, con el día de hoy destacado. |
+| **Horario** | Clases semanales sin solapes: rejilla en escritorio y lista por día en el móvil, con el día de hoy destacado, el recreo como una banda propia, las horas seguidas de la misma asignatura unidas y la clase de «Ahora» y la de «Después» marcadas. |
 | **Calendario** | Vista mensual con exámenes y fechas límite de tareas en el color de su asignatura. Al pulsar un día se ve lo que hay; en el móvil, agenda del mes en lista. |
 | **Objetivos** | Metas medibles («5 ejercicios», «20 horas»…) con barra de progreso y botones +/−. Se completan solas al llegar a la meta. |
 | **Estadísticas** | Gráficos SVG hechos a mano: media por asignatura, evolución de las notas, tareas completadas por semana y tareas por estado, con *tooltips*. |
 | **Perfil** | Datos personales, tema claro/oscuro/sistema, cambio de contraseña y eliminación de la cuenta. |
+| **Calendarios** | Conecta Moodle y Google Classroom por su URL iCal: sus entregas y exámenes se importan como tareas y exámenes en la asignatura que corresponde (solo fechas y títulos, nunca notas), con vista previa, sincronización manual o automática e insignia «Moodle»/«Classroom». Ver [Calendarios de Moodle y Classroom](#calendarios-de-moodle-y-classroom). |
 
 ### Seguridad
 
@@ -31,6 +32,9 @@ que funciona igual de bien en el móvil que en el ordenador, con tema claro y os
   nadie puede ver ni modificar datos de otro usuario.
 - Todos los formularios llevan **token CSRF** y toda la salida se escapa con `e()` (evita XSS).
 - Patrón POST → redirección → GET con mensajes *flash*.
+- Las URLs secretas de los calendarios se guardan **cifradas** (AES-256-GCM con `APP_KEY`) y
+  en pantalla solo se ven enmascaradas. Al descargarlas se bloquean las direcciones locales y
+  de redes privadas (**protección SSRF**), con límite de tiempo, de tamaño y de redirecciones.
 
 ## Capturas
 
@@ -76,6 +80,8 @@ que funciona igual de bien en el móvil que en el ordenador, con tema claro y os
       Crea la base de datos `studytrack` con todas sus tablas.
    2. Repite con `sql/demo_data.sql` para cargar el [usuario de prueba](#usuario-de-prueba) (opcional).
 4. Entra en <http://localhost/StudyTrack> e inicia sesión con el usuario de prueba o crea tu cuenta.
+5. Para conectar calendarios de Moodle o Classroom, crea la clave `APP_KEY`
+   (ver [Configuración](#configuración)).
 
 Si tu MySQL tiene contraseña o un usuario distinto de `root`, mira [Configuración](#configuración).
 
@@ -91,10 +97,11 @@ Si tu MySQL tiene contraseña o un usuario distinto de `root`, mira [Configuraci
 ### Con Docker
 
 Solo necesitas [Docker Desktop](https://www.docker.com/products/docker-desktop/) (o Docker Engine con Compose).
-`docker-compose.yml` arranca dos contenedores: la app (PHP 8.3 + Apache) y MySQL 8.4.
+`docker-compose.yml` arranca tres contenedores: la app (PHP 8.3 + Apache), MySQL 8.4 y `sync`,
+que sincroniza los calendarios externos cada hora.
 
 ```bash
-cp .env.example .env      # opcional: cambia las contraseñas y el puerto
+cp .env.example .env      # cambia las contraseñas, el puerto y pon tu APP_KEY
 docker compose up -d --build
 ```
 
@@ -128,6 +135,19 @@ mysql -u root < sql/demo_data.sql   # opcional
 > ⚠️ `database.sql` **borra y vuelve a crear las tablas**: si lo reimportas perderás los datos.
 > `demo_data.sql` se puede reimportar cuando quieras: solo borra y recrea el usuario de prueba.
 
+**Si ya tenías la base de datos** de una versión anterior, no reimportes `database.sql`: aplica
+las migraciones de `sql/migrations/` en orden (se importan igual, con phpMyAdmin o por consola).
+No borran nada:
+
+| Migración | Qué añade |
+| --- | --- |
+| `002_calendarios_externos.sql` | Calendarios externos: tablas `calendarios_externos` y `correspondencias_externas`, y `calendario_id`/`uid_externo` en tareas y exámenes |
+
+**Mis asignaturas y mi horario de 2º DAW** (`sql/mi_curso.sql`, opcional): regístrate en la web,
+cambia `TU_EMAIL_AQUI` por tu email al principio del archivo e impórtalo. Carga las 8 asignaturas
+(con su profesor, color y abreviatura) y las 30 horas del horario en tu cuenta. Se puede importar
+varias veces sin duplicar nada y no toca tus tareas, exámenes ni notas.
+
 ### Configuración
 
 Los valores por defecto funcionan con XAMPP y Laragon (usuario `root` sin contraseña).
@@ -147,16 +167,81 @@ También se pueden usar variables de entorno:
 | `DB_USER`, `DB_PASS` | `root`, *(vacía)* | Credenciales |
 | `APP_DEBUG` | `false` | `true` muestra los detalles de los errores. Solo para desarrollo. |
 | `TRUST_PROXY` | `false` | `true` si hay un proxy inverso con HTTPS delante (usa `X-Forwarded-Proto`). |
+| `APP_KEY` | *(vacía)* | Clave que cifra las URLs de los calendarios de Moodle y Classroom. Sin ella no se pueden conectar. |
 
 Para activar la depuración en XAMPP o Laragon, añade `SetEnv APP_DEBUG true` al final de
 `httpd.conf` (en XAMPP, *Config → Apache (httpd.conf)*) y reinicia Apache.
 
+**`APP_KEY`**: copia `config/app.local.example.php` como `config/app.local.php` (Git lo ignora) y
+pon una clave aleatoria, que puedes generar con:
+
+```bash
+php -r "echo 'base64:' . base64_encode(random_bytes(32)), PHP_EOL;"
+# En XAMPP: C:\xampp\php\php.exe -r "echo 'base64:' . base64_encode(random_bytes(32)), PHP_EOL;"
+```
+
+En Docker, ponla en `.env` (`APP_KEY=base64:…`). No la cambies después de conectar calendarios:
+las URLs guardadas con la clave anterior ya no se podrían leer.
+
 La cookie de sesión se marca como `Secure` automáticamente cuando la web se sirve por HTTPS.
 
-El resto de ajustes (nombre, zona horaria, nota de aprobado…) están en `config/app.php`.
+El resto de ajustes (nombre, zona horaria, nota de aprobado, recreo, aula por defecto de los
+exámenes importados…) están en `config/app.php`.
 
 El archivo `.htaccess` impide el acceso directo a las carpetas internas
-(`config/`, `includes/`, `models/`, `views/`, `sql/`…) y el listado de directorios.
+(`config/`, `includes/`, `models/`, `views/`, `sql/`, `cron/`) y el listado de directorios.
+
+## Calendarios de Moodle y Classroom
+
+En **Perfil → Calendarios de Moodle y Classroom** (o *Calendarios* en el menú) se conecta la
+URL iCal de cada calendario. Solo se importan **fechas y títulos**: cada entrega es una tarea y
+cada examen un examen; las notas no se importan nunca.
+
+![Calendarios externos conectados](assets/img/screenshots/calendarios.png)
+
+- **Moodle**: *Calendario → Importar o exportar calendarios → Exportar calendario*, marca
+  «Todos los eventos» y «Recientes y próximos» y pulsa *Obtener URL del calendario*.
+  Moodle junta todos tus cursos: cada evento va a la asignatura de su curso (se reconoce por el
+  nombre o por la abreviatura que pongas al principio de la descripción de la asignatura: DWES, DWEC…).
+- **Classroom**: en Google Calendar, *⋮ junto a la clase → Configuración y uso compartido →
+  Dirección secreta en formato iCal*. Hay un calendario por clase: al conectarlo, elige su asignatura.
+- Antes de importar se ve una **vista previa** con la asignatura que tendrá cada evento. Lo que no
+  se reconoce queda en **Pendientes de asignar**, donde eliges la asignatura y StudyTrack lo recuerda.
+- Al sincronizar solo se actualizan el título y la fecha: tu estado, prioridad y asignatura se
+  respetan, y nunca se borra nada aunque desaparezca del calendario de origen.
+- ⚠️ Esa URL da acceso a tu calendario: trátala como una contraseña.
+
+Para probar sin Moodle puedes conectar el calendario de ejemplo `sql/demo_calendar.ics` desde
+<https://raw.githubusercontent.com/Frxnker/StudyTrack/feature/calendarios/sql/demo_calendar.ics>
+(por seguridad no se aceptan URLs de `localhost`). Sus fechas se regeneran con
+`php sql/generar_demo_calendar.php`.
+
+### Sincronización automática (cada hora)
+
+`cron/sync_calendars.php` sincroniza todos los calendarios que tengan activada la sincronización
+automática. Solo funciona por línea de comandos (desde la web responde 404).
+
+**Windows (XAMPP), con el Programador de tareas.** En una consola (cmd):
+
+```bat
+schtasks /Create /TN "StudyTrack - Calendarios" /SC HOURLY /F /TR "cmd /c C:\xampp\php\php.exe C:\xampp\htdocs\StudyTrack\cron\sync_calendars.php >> C:\xampp\htdocs\StudyTrack\cron\sync.log 2>&1"
+```
+
+O desde la interfaz: *Programador de tareas → Crear tarea básica → Diariamente → Iniciar un
+programa* (`C:\xampp\php\php.exe`, argumento `C:\xampp\htdocs\StudyTrack\cron\sync_calendars.php`)
+y, en sus propiedades, *Desencadenadores → Repetir la tarea cada 1 hora*. MySQL tiene que estar
+arrancado. Para probarlo a mano: `C:\xampp\php\php.exe C:\xampp\htdocs\StudyTrack\cron\sync_calendars.php`.
+
+**Linux, con cron** (`crontab -e`):
+
+```cron
+0 * * * * php /var/www/html/StudyTrack/cron/sync_calendars.php >> /var/log/studytrack-sync.log 2>&1
+```
+
+**Docker**: `docker-compose.yml` ya incluye el servicio `sync`, que usa la misma imagen y ejecuta
+el script cada hora (`docker compose logs -f sync`). Si prefieres cron dentro del contenedor de la
+app, instala `cron` en el `Dockerfile` y añade la línea anterior; o lanza una sincronización a mano
+con `docker compose exec app php cron/sync_calendars.php`.
 
 ## Usuario de prueba
 
@@ -184,16 +269,19 @@ StudyTrack/
 ├── calendar.php          │
 ├── goals.php             │
 ├── statistics.php        │
-├── profile.php           ┘
+├── profile.php           │
+├── calendars.php         ┘ (calendarios externos: Moodle, Classroom)
 ├── config/
-│   ├── app.php           Ajustes generales (zona horaria, nota de aprobado…)
+│   ├── app.php           Ajustes generales (zona horaria, nota de aprobado, recreo…)
+│   ├── app.local.example.php   Ejemplo de app.local.php (APP_KEY)
 │   └── database.php      Conexión PDO y funciones db_one(), db_all(), db_execute()…
 ├── includes/
 │   ├── bootstrap.php     Arranque común de todas las páginas
 │   ├── auth.php          Sesión segura, login y protección de páginas
-│   ├── functions.php     Escape, CSRF, validación, fechas, render()…
+│   ├── functions.php     Escape, CSRF, cifrado, validación, fechas, render()…
+│   ├── ical.php          Lector iCal y descarga segura de calendarios (sin librerías)
 │   └── header.php, navbar.php, footer.php   Layout
-├── models/               Consultas SQL de cada tabla (subject_*, task_*, exam_*…)
+├── models/               Consultas SQL de cada tabla (subject_*, task_*, exam_*, calendar_feed_*…)
 ├── views/                Plantillas HTML de cada sección
 │   └── partials/         Fragmentos reutilizables (estado vacío, cuenta atrás, borrar…)
 ├── css/
@@ -203,17 +291,24 @@ StudyTrack/
 │   ├── app.js            Menú, avisos, confirmaciones, filtros, cuenta atrás…
 │   ├── dashboard.js      Animaciones del dashboard
 │   ├── calendar.js       Lista del día pulsado en el calendario
+│   ├── calendars.js      Color de la asignatura en el formulario de calendarios
 │   ├── goals.js          Estado del formulario de objetivos según el progreso
 │   └── statistics.js     Gráficos SVG
+├── cron/
+│   └── sync_calendars.php   Sincronización automática de calendarios (solo consola)
 ├── sql/
 │   ├── database.sql      Esquema de la base de datos
-│   └── demo_data.sql     Datos de ejemplo
+│   ├── migrations/       Cambios para bases de datos ya en uso (002_calendarios_externos.sql)
+│   ├── demo_data.sql     Datos de ejemplo
+│   ├── mi_curso.sql      Mis asignaturas y mi horario de 2º DAW (cambia el email)
+│   ├── demo_calendar.ics Calendario de ejemplo para probar la importación
+│   └── generar_demo_calendar.php   Regenera demo_calendar.ics con fechas de hoy
 ├── assets/
 │   ├── fonts/            Tipografía Inter (woff2, pesos 400–800)
 │   ├── vendor/remixicon/ Iconos Remix Icon (CSS y fuentes)
 │   └── img/              Favicon y capturas de este README (screenshots/)
 ├── .htaccess             Bloquea el acceso a las carpetas internas
 ├── Dockerfile            Imagen PHP 8.3 + Apache
-├── docker-compose.yml    App + MySQL con importación automática del SQL
+├── docker-compose.yml    App + MySQL (con importación automática del SQL) + sincronización
 └── .env.example          Variables para Docker (copiar como .env)
 ```

@@ -82,7 +82,7 @@ $pendingCount = array_sum(array_map(static fn (array $g): int => count($g['tarea
             <dt>Última sincronización</dt>
             <dd><?= $calendar['ultima_sincronizacion'] ? e(ucfirst(format_moment($calendar['ultima_sincronizacion']))) : '<span class="text-soft">Nunca</span>' ?></dd>
           </div>
-          <div>
+          <div class="feed-card__wide">
             <dt>URL</dt>
             <dd class="feed-card__url"><i class="ri-lock-2-line" aria-hidden="true"></i> <?= e($calendar['url_enmascarada']) ?></dd>
           </div>

@@ -4266,6 +4266,10 @@ a.grade-mini__subject:hover {
   font-size: .9rem;
 }
 
+.feed-card__wide {
+  grid-column: 1 / -1;
+}
+
 .feed-card__url {
   color: var(--c-text-2);
   word-break: break-all; /* la URL se corta donde haga falta, junto al candado */
