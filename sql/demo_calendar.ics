@@ -1,0 +1,113 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//StudyTrack//Calendario de ejemplo//ES
+CALSCALE:GREGORIAN
+X-WR-CALNAME:Moodle · IES Celia Viñas (ejemplo)
+X-WR-TIMEZONE:Europe/Madrid
+BEGIN:VTIMEZONE
+TZID:Europe/Madrid
+BEGIN:DAYLIGHT
+TZOFFSETFROM:+0100
+TZOFFSETTO:+0200
+TZNAME:CEST
+DTSTART:19700329T020000
+RRULE:FREQ=YEARLY;BYMONTH=3;BYDAY=-1SU
+END:DAYLIGHT
+BEGIN:STANDARD
+TZOFFSETFROM:+0200
+TZOFFSETTO:+0100
+TZNAME:CET
+DTSTART:19701025T030000
+RRULE:FREQ=YEARLY;BYMONTH=10;BYDAY=-1SU
+END:STANDARD
+END:VTIMEZONE
+BEGIN:VEVENT
+UID:1001@aulavirtual.iescelia.example
+SUMMARY:Práctica 3: API REST con PHP y PDO
+CATEGORIES:2º DAW - Desarrollo web en entorno servidor
+DTSTART:20261020T215900Z
+DTSTAMP:20261016T083221Z
+END:VEVENT
+BEGIN:VEVENT
+UID:1002@aulavirtual.iescelia.example
+SUMMARY:Examen UT2: JavaScript asíncrono y fetch
+CATEGORIES:DWEC 26/27
+DTSTART;TZID=Europe/Madrid:20261026T090000
+DTEND;TZID=Europe/Madrid:20261026T110000
+DTSTAMP:20261016T083221Z
+END:VEVENT
+BEGIN:VEVENT
+UID:1003@aulavirtual.iescelia.example
+SUMMARY:Entrega: despliegue de la aplicación con Docker
+CATEGORIES:Despliegue de aplicaciones web
+DTSTART;VALUE=DATE:20261022
+DTEND;VALUE=DATE:20261023
+DTSTAMP:20261016T083221Z
+END:VEVENT
+BEGIN:VEVENT
+UID:1004@aulavirtual.iescelia.example
+SUMMARY:Actividad 5: maquetación responsive\, accesible y con Flexbox\; Gr
+ id opcional (ver C:\\proyectos\\diw)
+DESCRIPTION:Requisitos:\n- Contraste AA\, navegación con teclado y textos 
+ alternativos.\n- Entregar el enlace al repositorio\; no se admiten archivos
+  .zip.
+CATEGORIES:Diseño de Interfaces Web (2º DAW)
+DTSTART:20261024T215900Z
+DTSTAMP:20261016T083221Z
+END:VEVENT
+BEGIN:VEVENT
+UID:1005@aulavirtual.iescelia.example
+SUMMARY:Prueba oral: job interview roleplay
+CATEGORIES:ING 2DAW
+DTSTART:20261028T090000Z
+DTSTAMP:20261016T083221Z
+END:VEVENT
+BEGIN:VEVENT
+UID:1006@aulavirtual.iescelia.example
+SUMMARY:Simulacro de entrevista y CV Europass
+CATEGORIES:EIE - Empresa e Iniciativa Emprendedora
+DTSTART:20261021T215900Z
+DTSTAMP:20261016T083221Z
+END:VEVENT
+BEGIN:VEVENT
+UID:1007@aulavirtual.iescelia.example
+SUMMARY:Charla de orientación académica y laboral
+CATEGORIES:Tutoría 2º curso
+DTSTART:20261019T100000Z
+DTSTAMP:20261016T083221Z
+END:VEVENT
+BEGIN:VEVENT
+UID:1008@aulavirtual.iescelia.example
+SUMMARY:Tests unitarios con PHPUnit
+CATEGORIES:2º DAW - Desarrollo web en entorno servidor
+DTSTART:20261031T225900Z
+DTSTAMP:20261016T083221Z
+END:VEVENT
+BEGIN:VEVENT
+UID:1009@aulavirtual.iescelia.example
+SUMMARY:Proyecto Web: entrega del anteproyecto
+DTSTART:20261105T225900Z
+DTSTAMP:20261016T083221Z
+END:VEVENT
+BEGIN:VEVENT
+UID:1010@aulavirtual.iescelia.example
+SUMMARY:Reunión del grupo de prácticas
+DTSTART:20261018T170000
+DTSTAMP:20261016T083221Z
+END:VEVENT
+BEGIN:VEVENT
+UID:1011@aulavirtual.iescelia.example
+SUMMARY:Práctica 1: entorno de desarrollo
+CATEGORIES:2º DAW - Desarrollo web en entorno servidor
+DTSTART:20260901T215900Z
+DTSTAMP:20261016T083221Z
+END:VEVENT
+BEGIN:VEVENT
+UID:1012@aulavirtual.iescelia.example
+SUMMARY:Examen de recuperación (cancelado)
+CATEGORIES:DWEC 26/27
+DTSTART:20261025T080000Z
+STATUS:CANCELLED
+DTSTAMP:20261016T083221Z
+END:VEVENT
+END:VCALENDAR
