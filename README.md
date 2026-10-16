@@ -36,9 +36,9 @@ que funciona igual de bien en el móvil que en el ordenador, con tema claro y os
 
 ![Inicio de sesión](assets/img/screenshots/login.png)
 
-| Inicio (móvil) | Tareas (móvil) | Exámenes (móvil) |
-| --- | --- | --- |
-| ![Dashboard en el móvil](assets/img/screenshots/dashboard-movil.png) | ![Listado de tareas en el móvil](assets/img/screenshots/tareas-movil.png) | ![Exámenes con cuenta atrás en el móvil](assets/img/screenshots/examenes-movil.png) |
+| Login (móvil) | Inicio (móvil) | Tareas (móvil) | Exámenes (móvil) |
+| --- | --- | --- | --- |
+| ![Inicio de sesión en el móvil](assets/img/screenshots/login-movil.png) | ![Dashboard en el móvil](assets/img/screenshots/dashboard-movil.png) | ![Listado de tareas en el móvil](assets/img/screenshots/tareas-movil.png) | ![Exámenes con cuenta atrás en el móvil](assets/img/screenshots/examenes-movil.png) |
 
 ![Calendario mensual](assets/img/screenshots/calendario.png)
 
