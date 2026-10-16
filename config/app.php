@@ -59,3 +59,6 @@ define('PASS_MARK', 5.0);
 // Descansos de la jornada: [inicio, fin, texto]. El horario los dibuja como una banda
 // entre las clases (no son franjas de la base de datos).
 define('SCHOOL_BREAKS', [['11:00', '11:30', 'Recreo']]);
+
+// Aula de los exámenes importados de un calendario cuando el evento no indica lugar
+define('EXAM_DEFAULT_ROOM', 'Aula 21 Informática');

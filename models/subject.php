@@ -65,6 +65,29 @@ function subject_options(int $userId): array
 }
 
 /**
+ * Asignaturas con su descripción (para reconocerlas en los calendarios importados).
+ */
+function subject_match_list(int $userId): array
+{
+    return db_all(
+        'SELECT id, nombre, descripcion, color FROM asignaturas WHERE usuario_id = :uid ORDER BY nombre',
+        ['uid' => $userId]
+    );
+}
+
+/**
+ * Abreviatura de una asignatura: el principio de su descripción si es corto y en
+ * mayúsculas. "DWEC · Tutor: Juan Pedro…" → "DWEC", "IPE II" → "IPE II".
+ * Null si la descripción no empieza por una abreviatura.
+ */
+function subject_abbreviation(?string $description): ?string
+{
+    $first = preg_split('/\s*(?:·|\||:|\(| - | – |\n)\s*/u', trim((string) $description), 2)[0] ?? '';
+
+    return preg_match('/^[A-ZÁÉÍÓÚÑ]{2,6}(?: [A-Z0-9]{1,3})?$/u', $first) === 1 ? $first : null;
+}
+
+/**
  * Una asignatura del usuario o null si no existe (o es de otro usuario).
  */
 function subject_find(int $userId, int $id): ?array
