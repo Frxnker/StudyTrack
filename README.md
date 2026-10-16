@@ -4,23 +4,23 @@ Aplicación web para que los estudiantes gestionen su curso en un solo lugar:
 asignaturas, tareas, exámenes, notas, horario, objetivos y estadísticas.
 
 Está hecha con **PHP 8 y MySQL, sin frameworks**, con un diseño *mobile-first*
-que funciona igual de bien en el móvil que en el ordenador.
+que funciona igual de bien en el móvil que en el ordenador, con tema claro y oscuro.
 
-![Dashboard de StudyTrack](docs/capturas/dashboard.png)
+![Dashboard de StudyTrack](assets/img/screenshots/dashboard.png)
 
 ## Funcionalidades
 
 | Sección | Qué puedes hacer |
 | --- | --- |
-| **Inicio** | Resumen del día: tareas para hoy y atrasadas, cuenta atrás del próximo examen, media general, progreso semanal y últimas notas. |
-| **Asignaturas** | Crear, editar y borrar asignaturas con profesor, curso y color. Cada tarjeta muestra la media, las tareas pendientes y los próximos exámenes. |
-| **Tareas** | Tareas con asignatura opcional, fecha límite, prioridad y estado. Pestañas (hoy, próximos 7 días, atrasadas), filtros, búsqueda y completar en un clic. Las vencidas se resaltan. |
-| **Exámenes** | Próximos exámenes con cuenta atrás y exámenes pasados, con botón para marcarlos como realizados y añadir su nota. |
-| **Notas** | Calificaciones de 0 a 10 por tipo (examen, práctica…), media por asignatura, media general y aprobado/suspenso. |
-| **Horario** | Clases semanales sin solapes: rejilla en escritorio y lista por día en el móvil. |
-| **Calendario** | Vista mensual con exámenes y fechas límite de tareas en el color de su asignatura, más una agenda del mes. |
+| **Inicio** | Resumen del día: tareas para hoy y atrasadas, exámenes de la semana, cuenta atrás del próximo examen, progreso académico (media general), resumen semanal y últimas notas. |
+| **Asignaturas** | Crear, editar y borrar asignaturas con profesor, curso y color (paleta o color libre). Cada tarjeta muestra la media, las tareas pendientes y el próximo examen; el detalle reúne sus tareas, exámenes, notas y horario. |
+| **Tareas** | Tareas con asignatura opcional, fecha límite, prioridad y estado. Pestañas (hoy, próximos 7 días, atrasadas), filtros, búsqueda y completar en un clic. Se resaltan las vencidas y las de hoy. |
+| **Exámenes** | Próximos exámenes con cuenta atrás y exámenes pasados. Un examen realizado tiene el botón «Añadir nota», que abre el formulario de notas ya rellenado. |
+| **Notas** | Calificaciones de 0 a 10 (con coma o punto y hasta dos decimales) por tipo, agrupadas por asignatura con su media, media general y aprobado/suspenso. |
+| **Horario** | Clases semanales sin solapes: rejilla en escritorio y lista por día en el móvil, con el día de hoy destacado. |
+| **Calendario** | Vista mensual con exámenes y fechas límite de tareas en el color de su asignatura. Al pulsar un día se ve lo que hay; en el móvil, agenda del mes en lista. |
 | **Objetivos** | Metas medibles («5 ejercicios», «20 horas»…) con barra de progreso y botones +/−. Se completan solas al llegar a la meta. |
-| **Estadísticas** | Gráficos SVG hechos a mano: media por asignatura, evolución de las notas, tareas completadas por semana y tareas por estado. |
+| **Estadísticas** | Gráficos SVG hechos a mano: media por asignatura, evolución de las notas, tareas completadas por semana y tareas por estado, con *tooltips*. |
 | **Perfil** | Datos personales, tema claro/oscuro/sistema, cambio de contraseña y eliminación de la cuenta. |
 
 ### Seguridad
@@ -34,15 +34,29 @@ que funciona igual de bien en el móvil que en el ordenador.
 
 ## Capturas
 
-| Tareas (móvil) | Exámenes (móvil) |
-| --- | --- |
-| ![Listado de tareas en el móvil](docs/capturas/tareas-movil.png) | ![Exámenes con cuenta atrás en el móvil](docs/capturas/examenes-movil.png) |
+![Inicio de sesión](assets/img/screenshots/login.png)
 
-![Calendario mensual](docs/capturas/calendario.png)
+| Inicio (móvil) | Tareas (móvil) | Exámenes (móvil) |
+| --- | --- | --- |
+| ![Dashboard en el móvil](assets/img/screenshots/dashboard-movil.png) | ![Listado de tareas en el móvil](assets/img/screenshots/tareas-movil.png) | ![Exámenes con cuenta atrás en el móvil](assets/img/screenshots/examenes-movil.png) |
 
-![Horario semanal](docs/capturas/horario.png)
+![Calendario mensual](assets/img/screenshots/calendario.png)
 
-![Estadísticas con el tema oscuro](docs/capturas/estadisticas-oscuro.png)
+![Horario semanal](assets/img/screenshots/horario.png)
+
+![Estadísticas con el tema oscuro](assets/img/screenshots/estadisticas-oscuro.png)
+
+## Tecnologías
+
+- **PHP 8** sin frameworks (`declare(strict_types=1)`): controladores en la raíz, modelos con las
+  consultas y vistas con `render()`.
+- **MySQL / MariaDB** con **PDO** y consultas preparadas. Claves foráneas compuestas para que la
+  base de datos impida mezclar datos de usuarios distintos.
+- **HTML5 y CSS3**: variables CSS, Grid y Flexbox, diseño *mobile-first* y tema oscuro.
+- **JavaScript vanilla**, sin librerías: menú, avisos, confirmaciones, cuentas atrás y gráficos en SVG.
+- **[Inter](https://rsms.me/inter/)** y **[Remix Icon](https://remixicon.com/)** servidos desde
+  `assets/`: la app se ve completa sin conexión a internet.
+- **Docker**: imagen `php:8.3-apache` y MySQL 8.4 con Docker Compose.
 
 ## Requisitos
 
@@ -56,9 +70,14 @@ que funciona igual de bien en el móvil que en el ordenador.
 
 1. Copia la carpeta del proyecto en `C:\xampp\htdocs\StudyTrack`
    (o clónala: `git clone https://github.com/Frxnker/StudyTrack.git C:\xampp\htdocs\StudyTrack`).
-2. Abre el panel de XAMPP e inicia **Apache** y **MySQL**.
-3. Importa la base de datos (ver [Base de datos](#base-de-datos)).
-4. Entra en <http://localhost/StudyTrack>.
+2. Abre el panel de XAMPP (`xampp-control.exe`) y pulsa **Start** en **Apache** y en **MySQL**.
+3. Abre phpMyAdmin en <http://localhost/phpmyadmin> e importa la base de datos:
+   1. Pestaña **Importar** → **Seleccionar archivo** → `sql/database.sql` → **Importar**.
+      Crea la base de datos `studytrack` con todas sus tablas.
+   2. Repite con `sql/demo_data.sql` para cargar el [usuario de prueba](#usuario-de-prueba) (opcional).
+4. Entra en <http://localhost/StudyTrack> e inicia sesión con el usuario de prueba o crea tu cuenta.
+
+Si tu MySQL tiene contraseña o un usuario distinto de `root`, mira [Configuración](#configuración).
 
 ### Con Laragon
 
@@ -183,12 +202,16 @@ StudyTrack/
 ├── js/
 │   ├── app.js            Menú, avisos, confirmaciones, filtros, cuenta atrás…
 │   ├── dashboard.js      Animaciones del dashboard
+│   ├── calendar.js       Lista del día pulsado en el calendario
+│   ├── goals.js          Estado del formulario de objetivos según el progreso
 │   └── statistics.js     Gráficos SVG
 ├── sql/
 │   ├── database.sql      Esquema de la base de datos
 │   └── demo_data.sql     Datos de ejemplo
-├── assets/img/           Favicon
-├── docs/capturas/        Imágenes de este README
+├── assets/
+│   ├── fonts/            Tipografía Inter (woff2, pesos 400–800)
+│   ├── vendor/remixicon/ Iconos Remix Icon (CSS y fuentes)
+│   └── img/              Favicon y capturas de este README (screenshots/)
 ├── .htaccess             Bloquea el acceso a las carpetas internas
 ├── Dockerfile            Imagen PHP 8.3 + Apache
 ├── docker-compose.yml    App + MySQL con importación automática del SQL
