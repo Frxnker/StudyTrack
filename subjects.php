@@ -88,10 +88,11 @@ function subject_render_form(array $subject, array $errors = [], bool $isEdit = 
     }
 
     render('subjects/form', [
-        'pageTitle' => $isEdit ? 'Editar asignatura' : 'Nueva asignatura',
-        'subject'   => $subject,
-        'errors'    => $errors,
-        'isEdit'    => $isEdit,
+        'pageTitle'     => $isEdit ? 'Editar asignatura' : 'Nueva asignatura',
+        'subject'       => $subject,
+        'errors'        => $errors,
+        'isEdit'        => $isEdit,
+        'deleteWarning' => $isEdit ? subject_delete_warning(current_user_id(), (int) $subject['id']) : '',
     ]);
 }
 

@@ -2,9 +2,10 @@
 /**
  * Vista: formulario de alta / edición de asignatura.
  *
- * @var array $subject  id, nombre, descripcion, profesor, curso, color
- * @var array $errors
- * @var bool  $isEdit
+ * @var array  $subject        id, nombre, descripcion, profesor, curso, color
+ * @var array  $errors
+ * @var bool   $isEdit
+ * @var string $deleteWarning  Qué se borra con la asignatura (solo al editar)
  */
 ?>
 <header class="page-header">
@@ -98,7 +99,7 @@
         'id'       => (int) $subject['id'],
         'label'    => 'Eliminar',
         'question' => '¿Eliminar la asignatura «' . $subject['nombre'] . '»?',
-        'text'     => 'Se borrarán también sus exámenes, notas y clases del horario. Esta acción no se puede deshacer.',
+        'text'     => $deleteWarning,
         'full'     => true,
     ]); ?>
   </section>
