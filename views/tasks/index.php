@@ -7,7 +7,7 @@
  * @var array  $viewCounts  [vista => nº de tareas]
  * @var array  $subjects    id, nombre, color
  * @var array  $filters     Filtros activos (vista, estado, asignatura, prioridad, q)
- * @var string $view
+ * @var string $currentView  Vista rápida activa (todas, hoy, semana, atrasadas)
  * @var string $today
  */
 
@@ -39,7 +39,7 @@ $activeFilters = count($listFilters);
 
 <nav class="tabs" aria-label="Vistas de tareas">
   <?php foreach (TASK_VIEWS as $key => $label): ?>
-    <?php $isActive = $key === $view; ?>
+    <?php $isActive = $key === $currentView; ?>
     <a href="<?= e(task_list_url(($key !== 'todas' ? ['vista' => $key] : []) + $listFilters)) ?>"
        class="tabs__item<?= $isActive ? ' is-active' : '' ?><?= $key === 'atrasadas' && $viewCounts[$key] > 0 ? ' tabs__item--danger' : '' ?>"
        <?= $isActive ? 'aria-current="page"' : '' ?>>
@@ -64,8 +64,8 @@ $activeFilters = count($listFilters);
   </summary>
 
   <form method="get" action="tasks.php" class="filters__form" role="search">
-    <?php if ($view !== 'todas'): ?>
-      <input type="hidden" name="vista" value="<?= e($view) ?>">
+    <?php if ($currentView !== 'todas'): ?>
+      <input type="hidden" name="vista" value="<?= e($currentView) ?>">
     <?php endif; ?>
 
     <div class="field filters__search">
@@ -116,7 +116,7 @@ $activeFilters = count($listFilters);
         <i class="ri-search-line" aria-hidden="true"></i> Aplicar
       </button>
       <?php if ($activeFilters): ?>
-        <a href="<?= e(task_list_url($view !== 'todas' ? ['vista' => $view] : [])) ?>" class="btn btn--ghost">Limpiar</a>
+        <a href="<?= e(task_list_url($currentView !== 'todas' ? ['vista' => $currentView] : [])) ?>" class="btn btn--ghost">Limpiar</a>
       <?php endif; ?>
     </div>
   </form>
@@ -209,7 +209,7 @@ $activeFilters = count($listFilters);
         'actionHref'  => 'tasks.php?action=new',
         'actionLabel' => 'Nueva tarea',
     ]); ?>
-  <?php elseif ($view === 'atrasadas' && !$listFilters): ?>
+  <?php elseif ($currentView === 'atrasadas' && !$listFilters): ?>
     <?php partial('empty', [
         'icon'  => 'ri-emotion-happy-line',
         'title' => '¡No tienes tareas atrasadas!',

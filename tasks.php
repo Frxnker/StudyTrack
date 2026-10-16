@@ -202,14 +202,15 @@ if ($action === 'edit') {
 $view        = $filters['vista'] ?? 'todas';
 $listFilters = array_diff_key($filters, ['vista' => true]);
 
+// Ojo: no se puede pasar como 'view' (render() ya usa $view para el nombre de la plantilla)
 render('tasks/index', [
-    'pageTitle'  => 'Tareas',
-    'tasks'      => task_list($userId, $filters),
-    'counts'     => task_counts($userId),
-    'viewCounts' => task_view_counts($userId, $listFilters),
-    'subjects'   => subject_options($userId),
-    'filters'    => $filters,
-    'view'       => $view,
-    'today'      => today(),
-    'fab'        => ['href' => task_list_url(['action' => 'new'] + $filters), 'label' => 'Nueva tarea'],
+    'pageTitle'   => 'Tareas',
+    'tasks'       => task_list($userId, $filters),
+    'counts'      => task_counts($userId),
+    'viewCounts'  => task_view_counts($userId, $listFilters),
+    'subjects'    => subject_options($userId),
+    'filters'     => $filters,
+    'currentView' => $view,
+    'today'       => today(),
+    'fab'         => ['href' => task_list_url(['action' => 'new'] + $filters), 'label' => 'Nueva tarea'],
 ]);
