@@ -2,7 +2,9 @@
 /**
  * Navegación principal.
  *  - Sidebar: menú lateral fijo en escritorio y menú deslizante en móvil.
- *  - Bottom nav: barra inferior fija con las 5 secciones principales (móvil).
+ *  - Bottom nav: barra inferior fija (móvil) con las 4 secciones principales y una
+ *    quinta pestaña que abre el menú con el resto. En una de esas otras secciones,
+ *    la quinta pestaña muestra su icono y su nombre y queda marcada como activa.
  *
  * @var array|null $currentUser
  */
@@ -27,22 +29,14 @@ $navSections = [
     ],
 ];
 
-$bottomNav = ['dashboard', 'tasks', 'calendar', 'statistics', 'profile'];
-
-// Secciones sin pestaña propia en la barra inferior: se marca la pestaña "padre"
-// (todas las secciones dejan así alguna pestaña activa)
-$bottomNavParent = [
-    'subjects' => 'dashboard',   // el inicio resume las asignaturas
-    'exams'    => 'calendar',
-    'schedule' => 'calendar',
-    'grades'   => 'statistics',
-    'goals'    => 'statistics',  // el progreso de los objetivos está en estadísticas
-];
+$bottomNav = ['dashboard', 'tasks', 'calendar', 'statistics'];
 
 $activePage = current_page();
-$activeTab  = $bottomNavParent[$activePage] ?? $activePage;
+$navItems   = array_merge(...array_values($navSections));
 
-$navItems = array_merge(...array_values($navSections));
+// Quinta pestaña: "Más" o, si estamos en una sección que no está en la barra, esa sección
+$inMenuOnly = isset($navItems[$activePage]) && !in_array($activePage, $bottomNav, true);
+[$moreLabel, $moreIcon] = $inMenuOnly ? $navItems[$activePage] : ['Más', 'ri-apps-2'];
 ?>
 <aside class="sidebar" id="sidebar" aria-label="Menú principal">
   <div class="sidebar__header">
@@ -93,12 +87,18 @@ $navItems = array_merge(...array_values($navSections));
 <nav class="bottom-nav" aria-label="Navegación inferior">
   <?php foreach ($bottomNav as $page): ?>
     <?php [$label, $icon] = $navItems[$page]; ?>
-    <?php $isActive = $page === $activeTab; ?>
+    <?php $isActive = $page === $activePage; ?>
     <a href="<?= e($page) ?>.php"
        class="bottom-nav__item<?= $isActive ? ' is-active' : '' ?>"
-       <?= $page === $activePage ? 'aria-current="page"' : ($isActive ? 'aria-current="true"' : '') ?>>
+       <?= $isActive ? 'aria-current="page"' : '' ?>>
       <i class="<?= e($icon . ($isActive ? '-fill' : '-line')) ?>" aria-hidden="true"></i>
       <span><?= e($label) ?></span>
     </a>
   <?php endforeach; ?>
+  <button type="button" class="bottom-nav__item<?= $inMenuOnly ? ' is-active' : '' ?>"
+          data-sidebar-open aria-controls="sidebar" aria-expanded="false"
+          <?= $inMenuOnly ? 'aria-current="page" aria-label="' . e($moreLabel) . ': abrir el menú"' : 'aria-label="Más secciones: abrir el menú"' ?>>
+    <i class="<?= e($moreIcon . ($inMenuOnly ? '-fill' : '-line')) ?>" aria-hidden="true"></i>
+    <span><?= e($moreLabel) ?></span>
+  </button>
 </nav>

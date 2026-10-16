@@ -577,6 +577,15 @@ button, input, select, textarea {
   transition: color var(--dur) var(--ease);
 }
 
+/* La última pestaña es un <button> (abre el menú): sin estilos de botón del navegador */
+button.bottom-nav__item {
+  padding: 0;
+  border: 0;
+  background: none;
+  font-family: inherit;
+  cursor: pointer;
+}
+
 .bottom-nav__item i {
   font-size: 1.4rem;
   line-height: 1;

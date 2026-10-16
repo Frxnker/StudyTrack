@@ -17,32 +17,40 @@ const App = (() => {
   const $ = (selector, context = document) => context.querySelector(selector);
   const $$ = (selector, context = document) => [...context.querySelectorAll(selector)];
 
-  /* ---------- Menú lateral (drawer en móvil) ---------- */
+  /* ---------- Menú lateral (drawer en móvil) ----------
+   * Lo abren el botón de la barra superior y la última pestaña de la barra inferior.
+   */
   function initSidebar() {
     const sidebar = $('#sidebar');
     const backdrop = $('.sidebar-backdrop');
-    const openButton = $('[data-sidebar-open]');
-    if (!sidebar || !openButton) return;
+    const openButtons = $$('[data-sidebar-open]');
+    if (!sidebar || openButtons.length === 0) return;
 
-    const open = () => {
+    let opener = null; // botón que abrió el menú: recibe el foco al cerrarlo
+
+    const setExpanded = (value) => openButtons.forEach((b) => b.setAttribute('aria-expanded', String(value)));
+
+    const open = (event) => {
+      opener = event.currentTarget;
       sidebar.classList.add('is-open');
       backdrop?.classList.add('is-visible');
-      openButton.setAttribute('aria-expanded', 'true');
+      setExpanded(true);
       document.body.classList.add('no-scroll');
       // Movemos el foco dentro del menú para usuarios de teclado
-      setTimeout(() => $('.sidebar__link', sidebar)?.focus(), 50);
+      // (a la sección actual si está en el menú; si no, a la primera)
+      setTimeout(() => ($('.sidebar__link.is-active', sidebar) || $('.sidebar__link', sidebar))?.focus(), 50);
     };
 
     const close = () => {
       if (!sidebar.classList.contains('is-open')) return;
       sidebar.classList.remove('is-open');
       backdrop?.classList.remove('is-visible');
-      openButton.setAttribute('aria-expanded', 'false');
+      setExpanded(false);
       document.body.classList.remove('no-scroll');
-      openButton.focus();
+      opener?.focus();
     };
 
-    openButton.addEventListener('click', open);
+    openButtons.forEach((button) => button.addEventListener('click', open));
     $$('[data-sidebar-close]').forEach((el) => el.addEventListener('click', close));
     document.addEventListener('keydown', (event) => {
       if (event.key === 'Escape') close();
