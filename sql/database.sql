@@ -19,6 +19,10 @@
 --    de datos impide asociar un examen a una asignatura de otro usuario.
 --  - El progreso de un objetivo NO se guarda: se calcula a partir de
 --    valor_actual / valor_meta (evitamos datos derivados → 3FN).
+--  - Calendarios externos (Moodle, Classroom… por iCal): sus eventos se
+--    importan como tareas o exámenes con calendario_id y uid_externo, único por
+--    usuario para no duplicarlos. Si ya tienes una base de datos en marcha,
+--    aplica sql/migrations/002_calendarios_externos.sql en lugar de este archivo.
 -- =============================================================================
 
 CREATE DATABASE IF NOT EXISTS studytrack
@@ -35,6 +39,8 @@ DROP TABLE IF EXISTS horario;
 DROP TABLE IF EXISTS notas;
 DROP TABLE IF EXISTS examenes;
 DROP TABLE IF EXISTS tareas;
+DROP TABLE IF EXISTS correspondencias_externas;
+DROP TABLE IF EXISTS calendarios_externos;
 DROP TABLE IF EXISTS asignaturas;
 DROP TABLE IF EXISTS usuarios;
 
@@ -81,14 +87,71 @@ CREATE TABLE asignaturas (
 
 
 -- -----------------------------------------------------------------------------
+-- calendarios_externos: calendarios iCal conectados (Moodle, Classroom…)
+--   La URL se guarda cifrada con APP_KEY. asignatura_id usa una clave foránea
+--   simple: una compuesta con ON DELETE SET NULL pondría también usuario_id a
+--   NULL, y MySQL/MariaDB no lo permiten (la pertenencia se comprueba en PHP).
+-- -----------------------------------------------------------------------------
+CREATE TABLE calendarios_externos (
+  id                     INT UNSIGNED     NOT NULL AUTO_INCREMENT,
+  usuario_id             INT UNSIGNED     NOT NULL,
+  asignatura_id          INT UNSIGNED     NULL     COMMENT 'Si se indica, todos sus eventos son de esa asignatura',
+  nombre                 VARCHAR(100)     NOT NULL,
+  origen                 ENUM('moodle','classroom','otro') NOT NULL DEFAULT 'otro',
+  url                    TEXT             NOT NULL COMMENT 'Cifrada con APP_KEY (nunca en claro)',
+  tipo_por_defecto       ENUM('tarea','examen') NOT NULL DEFAULT 'tarea',
+  activo                 TINYINT(1)       NOT NULL DEFAULT 1 COMMENT 'La sincronización automática (cron) solo usa los activos',
+  ultima_sincronizacion  DATETIME         NULL,
+  ultimo_error           VARCHAR(500)     NULL,
+  fecha_creacion         DATETIME         NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  KEY idx_calendarios_usuario (usuario_id),
+  KEY idx_calendarios_asignatura (asignatura_id),
+  CONSTRAINT fk_calendarios_usuario
+    FOREIGN KEY (usuario_id) REFERENCES usuarios (id)
+    ON DELETE CASCADE,
+  CONSTRAINT fk_calendarios_asignatura
+    FOREIGN KEY (asignatura_id) REFERENCES asignaturas (id)
+    ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+-- -----------------------------------------------------------------------------
+-- correspondencias_externas: "este curso de Moodle es esta asignatura mía"
+--   Se crean desde calendars.php al asignar una tarea importada sin asignatura.
+-- -----------------------------------------------------------------------------
+CREATE TABLE correspondencias_externas (
+  id              INT UNSIGNED     NOT NULL AUTO_INCREMENT,
+  usuario_id      INT UNSIGNED     NOT NULL,
+  texto_origen    VARCHAR(255)     NOT NULL COMMENT 'Nombre del curso (CATEGORIES) o título del evento',
+  asignatura_id   INT UNSIGNED     NOT NULL,
+  fecha_creacion  DATETIME         NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  UNIQUE KEY uk_correspondencias_usuario_texto (usuario_id, texto_origen),
+  KEY idx_correspondencias_asignatura_usuario (asignatura_id, usuario_id),
+  CONSTRAINT fk_correspondencias_usuario
+    FOREIGN KEY (usuario_id) REFERENCES usuarios (id)
+    ON DELETE CASCADE,
+  CONSTRAINT fk_correspondencias_asignatura
+    FOREIGN KEY (asignatura_id, usuario_id) REFERENCES asignaturas (id, usuario_id)
+    ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+-- -----------------------------------------------------------------------------
 -- tareas: deberes y entregas
 --   La asignatura es opcional: si se borra la asignatura, la tarea se conserva
 --   sin asignatura (ON DELETE SET NULL).
+--   Las importadas de un calendario llevan calendario_id, uid_externo (único por
+--   usuario: un evento no se importa dos veces) y texto_origen.
 -- -----------------------------------------------------------------------------
 CREATE TABLE tareas (
   id                INT UNSIGNED   NOT NULL AUTO_INCREMENT,
   usuario_id        INT UNSIGNED   NOT NULL,
   asignatura_id     INT UNSIGNED   NULL,
+  calendario_id     INT UNSIGNED   NULL,
+  uid_externo       VARCHAR(255)   NULL COMMENT 'UID del evento iCal importado',
+  texto_origen      VARCHAR(255)   NULL COMMENT 'Curso o título de origen (para asignarle asignatura)',
   titulo            VARCHAR(150)   NOT NULL,
   descripcion       TEXT           NULL,
   fecha_limite      DATE           NULL,
@@ -97,25 +160,33 @@ CREATE TABLE tareas (
   fecha_creacion    DATETIME       NOT NULL DEFAULT CURRENT_TIMESTAMP,
   fecha_completada  DATETIME       NULL COMMENT 'Se rellena al completar (estadísticas semanales)',
   PRIMARY KEY (id),
+  UNIQUE KEY uk_tareas_usuario_uid (usuario_id, uid_externo),
   KEY idx_tareas_usuario_estado (usuario_id, estado),
   KEY idx_tareas_usuario_fecha (usuario_id, fecha_limite),
   KEY idx_tareas_asignatura (asignatura_id),
+  KEY idx_tareas_calendario (calendario_id),
   CONSTRAINT fk_tareas_usuario
     FOREIGN KEY (usuario_id) REFERENCES usuarios (id)
     ON DELETE CASCADE,
   CONSTRAINT fk_tareas_asignatura
     FOREIGN KEY (asignatura_id) REFERENCES asignaturas (id)
+    ON DELETE SET NULL,
+  CONSTRAINT fk_tareas_calendario
+    FOREIGN KEY (calendario_id) REFERENCES calendarios_externos (id)
     ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
 -- -----------------------------------------------------------------------------
 -- examenes
+--   Los importados de un calendario llevan calendario_id y uid_externo.
 -- -----------------------------------------------------------------------------
 CREATE TABLE examenes (
   id              INT UNSIGNED     NOT NULL AUTO_INCREMENT,
   usuario_id      INT UNSIGNED     NOT NULL,
   asignatura_id   INT UNSIGNED     NOT NULL,
+  calendario_id   INT UNSIGNED     NULL,
+  uid_externo     VARCHAR(255)     NULL COMMENT 'UID del evento iCal importado',
   nombre          VARCHAR(150)     NOT NULL,
   fecha           DATE             NOT NULL,
   hora            TIME             NULL,
@@ -124,14 +195,19 @@ CREATE TABLE examenes (
   estado          ENUM('pendiente','realizado','aplazado') NOT NULL DEFAULT 'pendiente',
   fecha_creacion  DATETIME         NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (id),
+  UNIQUE KEY uk_examenes_usuario_uid (usuario_id, uid_externo),
   KEY idx_examenes_usuario_fecha (usuario_id, fecha),
   KEY idx_examenes_asignatura_usuario (asignatura_id, usuario_id),
+  KEY idx_examenes_calendario (calendario_id),
   CONSTRAINT fk_examenes_usuario
     FOREIGN KEY (usuario_id) REFERENCES usuarios (id)
     ON DELETE CASCADE,
   CONSTRAINT fk_examenes_asignatura
     FOREIGN KEY (asignatura_id, usuario_id) REFERENCES asignaturas (id, usuario_id)
-    ON DELETE CASCADE
+    ON DELETE CASCADE,
+  CONSTRAINT fk_examenes_calendario
+    FOREIGN KEY (calendario_id) REFERENCES calendarios_externos (id)
+    ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
