@@ -85,10 +85,19 @@
   }
 
   .tabs {
-    margin-right: -1.5rem;
-    margin-left: -1.5rem;
-    padding-right: 1.5rem;
-    padding-left: 1.5rem;
+    gap: .4rem;
+  }
+
+  .tabs__item {
+    flex: none;
+    gap: .45rem;
+    padding: .4rem .6rem .4rem .95rem;
+    font-size: .875rem;
+  }
+
+  .tabs__count {
+    min-width: 1.5rem;
+    padding: .05rem .4rem;
   }
 
   .filters__form {
@@ -219,14 +228,6 @@
     margin-top: 0;
     padding-top: 0;
     border-top: 0;
-  }
-
-  .tabs {
-    flex-wrap: wrap;
-    margin-right: 0;
-    margin-left: 0;
-    padding-right: 0;
-    padding-left: 0;
   }
 }
 

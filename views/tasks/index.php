@@ -43,7 +43,13 @@ $activeFilters = count($listFilters);
     <a href="<?= e(task_list_url(($key !== 'todas' ? ['vista' => $key] : []) + $listFilters)) ?>"
        class="tabs__item<?= $isActive ? ' is-active' : '' ?><?= $key === 'atrasadas' && $viewCounts[$key] > 0 ? ' tabs__item--danger' : '' ?>"
        <?= $isActive ? 'aria-current="page"' : '' ?>>
-      <?= e($label) ?> <span class="tabs__count"><?= $viewCounts[$key] ?></span>
+      <?php if ($key === 'semana'): ?>
+        <?php // En móvil, "7 días": así caben las cuatro pestañas y se ve la de atrasadas ?>
+        <span><span class="hide-mobile">Próximos </span>7 días</span>
+      <?php else: ?>
+        <?= e($label) ?>
+      <?php endif; ?>
+      <span class="tabs__count"><?= $viewCounts[$key] ?></span>
     </a>
   <?php endforeach; ?>
 </nav>
