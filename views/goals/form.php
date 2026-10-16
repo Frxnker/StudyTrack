@@ -17,7 +17,7 @@ $statusIcons = ['pendiente' => 'ri-time-line', 'en_progreso' => 'ri-loader-4-lin
 </header>
 
 <section class="card card--form">
-  <form method="post" action="goals.php" class="form" data-loading>
+  <form method="post" action="goals.php" class="form" data-loading data-goal-form>
     <?= csrf_field() ?>
     <input type="hidden" name="action" value="<?= $isEdit ? 'update' : 'create' ?>">
     <?php if ($isEdit): ?>

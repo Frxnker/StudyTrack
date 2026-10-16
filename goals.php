@@ -70,10 +70,11 @@ function goal_render_form(array $goal, array $errors = [], bool $isEdit = false)
     }
 
     render('goals/form', [
-        'pageTitle' => $isEdit ? 'Editar objetivo' : 'Nuevo objetivo',
-        'goal'      => $goal,
-        'errors'    => $errors,
-        'isEdit'    => $isEdit,
+        'pageTitle'   => $isEdit ? 'Editar objetivo' : 'Nuevo objetivo',
+        'goal'        => $goal,
+        'errors'      => $errors,
+        'isEdit'      => $isEdit,
+        'pageScripts' => ['js/goals.js'],
     ]);
 }
 
