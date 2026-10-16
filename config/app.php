@@ -9,6 +9,8 @@
  *   APP_DEBUG=true    Muestra los detalles de los errores (solo en desarrollo)
  *   TRUST_PROXY=true  La app está detrás de un proxy inverso que termina el HTTPS
  *                     (Nginx, Traefik…) y se puede confiar en X-Forwarded-Proto
+ *   APP_KEY=…         Clave para cifrar las URLs de los calendarios conectados
+ *                     (también se puede poner en config/app.local.php)
  */
 
 declare(strict_types=1);
@@ -38,6 +40,14 @@ define('APP_DEBUG', env_bool('APP_DEBUG'));
 
 // ¿Confiar en la cabecera X-Forwarded-Proto para saber si la petición llegó por HTTPS?
 define('TRUST_PROXY', env_bool('TRUST_PROXY'));
+
+// Clave para cifrar datos sensibles: las URLs secretas de los calendarios conectados.
+// Se lee de config/app.local.php (ignorado por Git, ver app.local.example.php) o de la
+// variable de entorno APP_KEY. Genera una con:
+//   php -r "echo 'base64:' . base64_encode(random_bytes(32)), PHP_EOL;"
+$appLocal = is_file(__DIR__ . '/app.local.php') ? (array) require __DIR__ . '/app.local.php' : [];
+define('APP_KEY', (string) ($appLocal['APP_KEY'] ?? (getenv('APP_KEY') ?: '')));
+unset($appLocal);
 
 // Sesión
 define('SESSION_NAME', 'studytrack_session');

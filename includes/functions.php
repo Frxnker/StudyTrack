@@ -61,6 +61,73 @@ function verify_csrf(): void
     }
 }
 
+/**
+ * Clave de cifrado de la aplicación (APP_KEY) en binario: 32 bytes.
+ * Formato recomendado: "base64:" + 32 bytes aleatorios en base64. Cualquier otro
+ * texto de 32 caracteres o más también vale (se deriva con SHA-256).
+ * Lanza RuntimeException si falta o no es válida.
+ */
+function app_key(): string
+{
+    $key = APP_KEY;
+
+    if (str_starts_with($key, 'base64:')) {
+        $raw = base64_decode(substr($key, 7), true);
+        if ($raw !== false && strlen($raw) === 32) {
+            return $raw;
+        }
+    } elseif (strlen($key) >= 32) {
+        return hash('sha256', $key, true);
+    }
+
+    throw new RuntimeException('Falta APP_KEY o no es válida. Créala en config/app.local.php (ver config/app.local.example.php).');
+}
+
+function has_app_key(): bool
+{
+    try {
+        app_key();
+        return true;
+    } catch (RuntimeException) {
+        return false;
+    }
+}
+
+/**
+ * Cifra un texto con AES-256-GCM (cifrado autenticado: si alguien lo modifica
+ * en la base de datos, no se descifra). Resultado: "v1:" + base64(iv + etiqueta + datos).
+ */
+function encrypt_secret(string $plain): string
+{
+    $iv     = random_bytes(12);
+    $tag    = '';
+    $cipher = openssl_encrypt($plain, 'aes-256-gcm', app_key(), OPENSSL_RAW_DATA, $iv, $tag, '', 16);
+    if ($cipher === false) {
+        throw new RuntimeException('No se pudo cifrar el dato.');
+    }
+
+    return 'v1:' . base64_encode($iv . $tag . $cipher);
+}
+
+/**
+ * Descifra un texto de encrypt_secret(). Lanza RuntimeException si no se puede
+ * (dato manipulado o APP_KEY distinta de la que se usó al cifrar).
+ */
+function decrypt_secret(string $encoded): string
+{
+    $raw = str_starts_with($encoded, 'v1:') ? base64_decode(substr($encoded, 3), true) : false;
+    if ($raw === false || strlen($raw) < 28) {
+        throw new RuntimeException('El dato cifrado no tiene un formato válido.');
+    }
+
+    $plain = openssl_decrypt(substr($raw, 28), 'aes-256-gcm', app_key(), OPENSSL_RAW_DATA, substr($raw, 0, 12), substr($raw, 12, 16));
+    if ($plain === false) {
+        throw new RuntimeException('No se pudo descifrar la URL: ¿ha cambiado APP_KEY? Vuelve a introducirla.');
+    }
+
+    return $plain;
+}
+
 /* =============================================================================
  * 2. Peticiones y redirecciones
  * ========================================================================== */
