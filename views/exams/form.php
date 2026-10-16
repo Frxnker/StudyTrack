@@ -17,6 +17,13 @@ $backUrl     = exam_list_url($subjectFilter);
     <a href="<?= e($backUrl) ?>" class="back-link"><i class="ri-arrow-left-line" aria-hidden="true"></i> Exámenes</a>
     <h2 class="page-header__title"><?= $isEdit ? 'Editar examen' : 'Nuevo examen' ?></h2>
   </div>
+  <?php if ($isEdit && $exam['estado'] === 'realizado' && $exam['asignatura_id'] !== ''): ?>
+    <div class="page-header__actions">
+      <a href="<?= e(exam_grade_url($exam)) ?>" class="btn btn--secondary btn--sm">
+        <i class="ri-award-line" aria-hidden="true"></i> Añadir nota
+      </a>
+    </div>
+  <?php endif; ?>
 </header>
 
 <?php if (!$subjects): ?>

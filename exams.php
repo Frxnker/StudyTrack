@@ -30,6 +30,21 @@ function exam_list_url(int $subjectId = 0): string
     return 'exams.php' . ($subjectId > 0 ? '?asignatura=' . $subjectId : '');
 }
 
+/**
+ * Formulario de nota con la asignatura, el tipo "examen", la fecha y el nombre
+ * del examen ya rellenos (botón "Añadir nota" de un examen realizado).
+ */
+function exam_grade_url(array $exam): string
+{
+    return 'grades.php?' . http_build_query([
+        'action'     => 'new',
+        'asignatura' => (int) $exam['asignatura_id'],
+        'tipo'       => 'examen',
+        'fecha'      => $exam['fecha'],
+        'comentario' => $exam['nombre'],
+    ]);
+}
+
 function exam_form_data(): array
 {
     return [

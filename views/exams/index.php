@@ -173,9 +173,9 @@ $editUrl     = static fn (array $exam): string => 'exams.php?action=edit&id=' . 
                   </button>
                 </form>
               <?php elseif ($exam['estado'] === 'realizado'): ?>
-                <a href="grades.php?action=new&amp;asignatura=<?= (int) $exam['asignatura_id'] ?>&amp;tipo=examen&amp;fecha=<?= e($exam['fecha']) ?>"
-                   class="icon-btn icon-btn--sm" aria-label="Añadir la nota de <?= e($exam['nombre']) ?>" title="Añadir nota">
-                  <i class="ri-award-line" aria-hidden="true"></i>
+                <a href="<?= e(exam_grade_url($exam)) ?>" class="btn btn--secondary btn--sm"
+                   aria-label="Añadir nota de <?= e($exam['nombre']) ?>">
+                  <i class="ri-award-line" aria-hidden="true"></i> Añadir nota
                 </a>
               <?php endif; ?>
               <a href="<?= e($editUrl($exam)) ?>" class="icon-btn icon-btn--sm"

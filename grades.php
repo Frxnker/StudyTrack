@@ -148,7 +148,8 @@ if ($subjectId > 0 && !subject_belongs_to($userId, $subjectId)) {
 }
 
 if ($action === 'new') {
-    // Valores iniciales opcionales (p. ej. desde "Añadir nota" de un examen realizado)
+    // Valores iniciales opcionales (p. ej. desde "Añadir nota" de un examen realizado:
+    // asignatura, tipo, fecha y el nombre del examen como comentario)
     $type = query('tipo');
     $date = query('fecha');
     grade_render_form($userId, [
@@ -157,7 +158,7 @@ if ($action === 'new') {
         'tipo'          => isset(GRADE_TYPES[$type]) ? $type : 'examen',
         'nota'          => '',
         'fecha'         => is_valid_date($date) ? $date : today(),
-        'comentarios'   => '',
+        'comentarios'   => str_take(query('comentario'), 150),
     ], $subjectId);
     exit;
 }
