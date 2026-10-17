@@ -7,7 +7,10 @@
 Dockerfile
 docker-compose.yml
 README.md
-assets/img/screenshots/
+docs/
+# El .htaccess de la raíz no hace falta: en Docker la raíz web ya es public/
+/.htaccess
+scripts/
 sql/
 config/database.local.php
 config/app.local.php

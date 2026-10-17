@@ -16,7 +16,7 @@
 
 declare(strict_types=1);
 
-require __DIR__ . '/includes/bootstrap.php';
+require dirname(__DIR__) . '/includes/bootstrap.php';
 require_once BASE_PATH . '/models/calendar_feed.php';
 require_once BASE_PATH . '/models/subject.php';
 

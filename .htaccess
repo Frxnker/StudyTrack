@@ -1,9 +1,14 @@
-# StudyTrack · reglas de Apache (XAMPP, Laragon y la imagen de Docker)
+# StudyTrack · reglas de Apache para XAMPP y Laragon (necesita mod_rewrite)
+#
+# Solo public/ es accesible desde la web. Esta regla hace que la carpeta del proyecto
+# funcione como si fuera public/: http://localhost/StudyTrack/tasks.php sirve
+# public/tasks.php, y cualquier otra ruta (config/, models/, sql/, .git…) acaba
+# buscándose dentro de public/, donde no existe → 404.
+#
+# Si puedes configurar el servidor (Docker, un VirtualHost propio, php -S … -t public),
+# apunta la raíz web directamente a public/ y este archivo deja de usarse.
 
-# No mostrar el contenido de las carpetas
 Options -Indexes
 
-# Solo se accede directamente a las páginas de la raíz y a css/, js/ y assets/.
-# Las carpetas internas (configuración, modelos, plantillas, SQL, cron…) responden 404.
-RedirectMatch 404 /(config|includes|models|views|sql|cron)(/|$)
-RedirectMatch 404 /(\.git|\.env|\.docker|Dockerfile|docker-compose\.yml|README\.md)
+RewriteEngine On
+RewriteRule ^(.*)$ public/$1 [L]

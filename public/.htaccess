@@ -1,0 +1,11 @@
+# StudyTrack · raíz web (lo único que se sirve: páginas, css/, js/ y assets/)
+
+# No mostrar el contenido de las carpetas
+Options -Indexes
+
+# Activar mod_rewrite aquí (aunque no haya reglas) impide que se vuelva a aplicar
+# la regla del .htaccess de la raíz del proyecto, que mandaría a public/public/…
+# (en Docker mod_rewrite no está cargado ni hace falta)
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+</IfModule>

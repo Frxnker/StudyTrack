@@ -3,7 +3,7 @@
  * Genera sql/demo_calendar.ics: un calendario de ejemplo (como el que exporta Moodle)
  * con eventos de 2º DAW y fechas relativas a HOY, para probar la importación.
  *
- *   php sql/generar_demo_calendar.php          (XAMPP: C:\xampp\php\php.exe sql\generar_demo_calendar.php)
+ *   php scripts/generate_demo_calendar.php      (XAMPP: C:\xampp\php\php.exe scripts\generate_demo_calendar.php)
  *
  * Vuelve a ejecutarlo cuando quieras refrescar las fechas. Incluye a propósito:
  * un evento de día completo, uno con TZID=Europe/Madrid, varios en UTC, uno con
@@ -118,5 +118,5 @@ foreach ($events as $event) {
 }
 $ics .= "END:VCALENDAR\r\n";
 
-file_put_contents(__DIR__ . '/demo_calendar.ics', $ics);
+file_put_contents(dirname(__DIR__) . '/sql/demo_calendar.ics', $ics);
 echo 'sql/demo_calendar.ics generado con ' . count($events) . ' eventos (hoy: ' . date('d/m/Y') . ').' . PHP_EOL;

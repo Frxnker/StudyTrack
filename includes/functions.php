@@ -686,7 +686,7 @@ function partial(string $name, array $data = []): void
  */
 function asset(string $path): string
 {
-    $file = BASE_PATH . '/' . ltrim($path, '/');
+    $file = BASE_PATH . '/public/' . ltrim($path, '/');
     $version = is_file($file) ? (string) filemtime($file) : APP_VERSION;
 
     return e($path . '?v=' . $version);

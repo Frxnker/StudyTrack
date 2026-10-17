@@ -17,12 +17,16 @@ RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini" \
       'error_log = /dev/stderr' \
       > "$PHP_INI_DIR/conf.d/studytrack.ini"
 
-# Apache: activa el .htaccess del proyecto (bloquea las carpetas internas)
-# y no anuncia la versión del servidor
-RUN printf '%s\n' \
+# Apache: la raíz web es public/ (el resto del código queda fuera de la web),
+# se activa su .htaccess y no se anuncia la versión del servidor
+RUN sed -ri 's#DocumentRoot /var/www/html$#DocumentRoot /var/www/html/public#' /etc/apache2/sites-available/000-default.conf \
+ && printf '%s\n' \
       'ServerTokens Prod' \
       'ServerSignature Off' \
       '<Directory /var/www/html>' \
+      '    AllowOverride None' \
+      '</Directory>' \
+      '<Directory /var/www/html/public>' \
       '    Options -Indexes +FollowSymLinks' \
       '    AllowOverride All' \
       '</Directory>' \

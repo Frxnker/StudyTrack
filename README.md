@@ -6,7 +6,7 @@ asignaturas, tareas, exámenes, notas, horario, objetivos y estadísticas.
 Está hecha con **PHP 8 y MySQL, sin frameworks**, con un diseño *mobile-first*
 que funciona igual de bien en el móvil que en el ordenador, con tema claro y oscuro.
 
-![Dashboard de StudyTrack](assets/img/screenshots/dashboard.png)
+![Dashboard de StudyTrack](docs/screenshots/dashboard.png)
 
 ## Funcionalidades
 
@@ -38,28 +38,28 @@ que funciona igual de bien en el móvil que en el ordenador, con tema claro y os
 
 ## Capturas
 
-![Inicio de sesión](assets/img/screenshots/login.png)
+![Inicio de sesión](docs/screenshots/login.png)
 
 | Login (móvil) | Inicio (móvil) | Tareas (móvil) | Exámenes (móvil) |
 | --- | --- | --- | --- |
-| ![Inicio de sesión en el móvil](assets/img/screenshots/login-movil.png) | ![Dashboard en el móvil](assets/img/screenshots/dashboard-movil.png) | ![Listado de tareas en el móvil](assets/img/screenshots/tareas-movil.png) | ![Exámenes con cuenta atrás en el móvil](assets/img/screenshots/examenes-movil.png) |
+| ![Inicio de sesión en el móvil](docs/screenshots/login-movil.png) | ![Dashboard en el móvil](docs/screenshots/dashboard-movil.png) | ![Listado de tareas en el móvil](docs/screenshots/tareas-movil.png) | ![Exámenes con cuenta atrás en el móvil](docs/screenshots/examenes-movil.png) |
 
-![Calendario mensual](assets/img/screenshots/calendario.png)
+![Calendario mensual](docs/screenshots/calendario.png)
 
-![Horario semanal](assets/img/screenshots/horario.png)
+![Horario semanal](docs/screenshots/horario.png)
 
-![Estadísticas con el tema oscuro](assets/img/screenshots/estadisticas-oscuro.png)
+![Estadísticas con el tema oscuro](docs/screenshots/estadisticas-oscuro.png)
 
 ## Tecnologías
 
-- **PHP 8** sin frameworks (`declare(strict_types=1)`): controladores en la raíz, modelos con las
+- **PHP 8** sin frameworks (`declare(strict_types=1)`): controladores en `public/`, modelos con las
   consultas y vistas con `render()`.
 - **MySQL / MariaDB** con **PDO** y consultas preparadas. Claves foráneas compuestas para que la
   base de datos impida mezclar datos de usuarios distintos.
 - **HTML5 y CSS3**: variables CSS, Grid y Flexbox, diseño *mobile-first* y tema oscuro.
 - **JavaScript vanilla**, sin librerías: menú, avisos, confirmaciones, cuentas atrás y gráficos en SVG.
 - **[Inter](https://rsms.me/inter/)** y **[Remix Icon](https://remixicon.com/)** servidos desde
-  `assets/`: la app se ve completa sin conexión a internet.
+  `public/assets/`: la app se ve completa sin conexión a internet.
 - **Docker**: imagen `php:8.3-apache` y MySQL 8.4 con Docker Compose.
 
 ## Requisitos
@@ -188,8 +188,11 @@ La cookie de sesión se marca como `Secure` automáticamente cuando la web se si
 El resto de ajustes (nombre, zona horaria, nota de aprobado, recreo, aula por defecto de los
 exámenes importados…) están en `config/app.php`.
 
-El archivo `.htaccess` impide el acceso directo a las carpetas internas
-(`config/`, `includes/`, `models/`, `views/`, `sql/`, `cron/`) y el listado de directorios.
+Desde la web solo se sirve la carpeta `public/` (páginas, CSS, JS y recursos); el resto del
+código (`config/`, `includes/`, `models/`, `views/`, `sql/`, `cron/`…) queda fuera. En XAMPP y
+Laragon lo hace el `.htaccess` de la raíz, que necesita `mod_rewrite` (viene activado). Si
+configuras tú el servidor, apunta la raíz web directamente a `public/`; por ejemplo, con el
+servidor de PHP: `php -S localhost:8000 -t public`.
 
 ## Calendarios de Moodle y Classroom
 
@@ -197,7 +200,7 @@ En **Perfil → Calendarios de Moodle y Classroom** (o *Calendarios* en el menú
 URL iCal de cada calendario. Solo se importan **fechas y títulos**: cada entrega es una tarea y
 cada examen un examen; las notas no se importan nunca.
 
-![Calendarios externos conectados](assets/img/screenshots/calendarios.png)
+![Calendarios externos conectados](docs/screenshots/calendarios.png)
 
 - **Moodle**: *Calendario → Importar o exportar calendarios → Exportar calendario*, marca
   «Todos los eventos» y «Recientes y próximos» y pulsa *Obtener URL del calendario*.
@@ -214,7 +217,7 @@ cada examen un examen; las notas no se importan nunca.
 Para probar sin Moodle puedes conectar el calendario de ejemplo `sql/demo_calendar.ics` desde
 <https://raw.githubusercontent.com/Frxnker/StudyTrack/feature/calendarios/sql/demo_calendar.ics>
 (por seguridad no se aceptan URLs de `localhost`). Sus fechas se regeneran con
-`php sql/generar_demo_calendar.php`.
+`php scripts/generate_demo_calendar.php`.
 
 ### Sincronización automática (cada hora)
 
@@ -258,19 +261,35 @@ Las fechas son relativas al día de la importación, así que siempre hay tareas
 
 ```text
 StudyTrack/
-├── index.php             Entrada: lleva al dashboard o al login
-├── login.php, register.php, logout.php
-├── dashboard.php         ┐
-├── subjects.php          │
-├── tasks.php             │
-├── exams.php             │ Controladores: reciben la petición, validan,
-├── grades.php            │ llaman a los modelos y pintan una vista
-├── schedule.php          │
-├── calendar.php          │
-├── goals.php             │
-├── statistics.php        │
-├── profile.php           │
-├── calendars.php         ┘ (calendarios externos: Moodle, Classroom)
+├── public/               Raíz web: lo único accesible desde el navegador
+│   ├── index.php         Entrada: lleva al dashboard o al login
+│   ├── login.php, register.php, logout.php
+│   ├── dashboard.php     ┐
+│   ├── subjects.php      │
+│   ├── tasks.php         │
+│   ├── exams.php         │ Controladores: reciben la petición, validan,
+│   ├── grades.php        │ llaman a los modelos y pintan una vista
+│   ├── schedule.php      │
+│   ├── calendar.php      │
+│   ├── goals.php         │
+│   ├── statistics.php    │
+│   ├── profile.php       │
+│   ├── calendars.php     ┘ (calendarios externos: Moodle, Classroom)
+│   ├── css/
+│   │   ├── style.css     Estilos base mobile-first y tema oscuro
+│   │   └── responsive.css   Ajustes para tablet y escritorio
+│   ├── js/
+│   │   ├── app.js        Menú, avisos, confirmaciones, filtros, cuenta atrás…
+│   │   ├── dashboard.js  Animaciones del dashboard
+│   │   ├── calendar.js   Lista del día pulsado en el calendario
+│   │   ├── calendars.js  Color de la asignatura en el formulario de calendarios
+│   │   ├── goals.js      Estado del formulario de objetivos según el progreso
+│   │   └── statistics.js Gráficos SVG
+│   ├── assets/
+│   │   ├── fonts/        Tipografía Inter (woff2, pesos 400–800)
+│   │   ├── vendor/remixicon/   Iconos Remix Icon (CSS y fuentes)
+│   │   └── img/          Favicon
+│   └── .htaccess         Sin listado de directorios
 ├── config/
 │   ├── app.php           Ajustes generales (zona horaria, nota de aprobado, recreo…)
 │   ├── app.local.example.php   Ejemplo de app.local.php (APP_KEY)
@@ -282,32 +301,21 @@ StudyTrack/
 │   ├── ical.php          Lector iCal y descarga segura de calendarios (sin librerías)
 │   └── header.php, navbar.php, footer.php   Layout
 ├── models/               Consultas SQL de cada tabla (subject_*, task_*, exam_*, calendar_feed_*…)
-├── views/                Plantillas HTML de cada sección
+├── views/                Plantillas HTML de cada sección (una carpeta por sección)
 │   └── partials/         Fragmentos reutilizables (estado vacío, cuenta atrás, borrar…)
-├── css/
-│   ├── style.css         Estilos base mobile-first y tema oscuro
-│   └── responsive.css    Ajustes para tablet y escritorio
-├── js/
-│   ├── app.js            Menú, avisos, confirmaciones, filtros, cuenta atrás…
-│   ├── dashboard.js      Animaciones del dashboard
-│   ├── calendar.js       Lista del día pulsado en el calendario
-│   ├── calendars.js      Color de la asignatura en el formulario de calendarios
-│   ├── goals.js          Estado del formulario de objetivos según el progreso
-│   └── statistics.js     Gráficos SVG
 ├── cron/
 │   └── sync_calendars.php   Sincronización automática de calendarios (solo consola)
+├── scripts/
+│   └── generate_demo_calendar.php   Regenera sql/demo_calendar.ics con fechas de hoy
 ├── sql/
-│   ├── database.sql      Esquema de la base de datos
+│   ├── database.sql      Esquema de la base de datos (hace de migración 001)
 │   ├── migrations/       Cambios para bases de datos ya en uso (002_calendarios_externos.sql)
 │   ├── demo_data.sql     Datos de ejemplo
 │   ├── mi_curso.sql      Mis asignaturas y mi horario de 2º DAW (cambia el email)
-│   ├── demo_calendar.ics Calendario de ejemplo para probar la importación
-│   └── generar_demo_calendar.php   Regenera demo_calendar.ics con fechas de hoy
-├── assets/
-│   ├── fonts/            Tipografía Inter (woff2, pesos 400–800)
-│   ├── vendor/remixicon/ Iconos Remix Icon (CSS y fuentes)
-│   └── img/              Favicon y capturas de este README (screenshots/)
-├── .htaccess             Bloquea el acceso a las carpetas internas
+│   └── demo_calendar.ics Calendario de ejemplo para probar la importación
+├── docs/
+│   └── screenshots/      Capturas de este README
+├── .htaccess             XAMPP/Laragon: sirve public/ como raíz web
 ├── Dockerfile            Imagen PHP 8.3 + Apache
 ├── docker-compose.yml    App + MySQL (con importación automática del SQL) + sincronización
 └── .env.example          Variables para Docker (copiar como .env)

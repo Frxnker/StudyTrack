@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-require __DIR__ . '/includes/bootstrap.php';
+require dirname(__DIR__) . '/includes/bootstrap.php';
 require_once BASE_PATH . '/models/goal.php';
 
 require_login();

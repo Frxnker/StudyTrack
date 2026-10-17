@@ -9,7 +9,7 @@
 
 declare(strict_types=1);
 
-require __DIR__ . '/includes/bootstrap.php';
+require dirname(__DIR__) . '/includes/bootstrap.php';
 require_once BASE_PATH . '/models/task.php';
 require_once BASE_PATH . '/models/exam.php';
 require_once BASE_PATH . '/models/grade.php';
@@ -87,7 +87,7 @@ if (!$subjects) {
     }
 }
 
-render('dashboard', [
+render('dashboard/index', [
     'pageTitle'      => 'Inicio',
     'summary'        => $summary,
     'today'          => $today,
